@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Submit Challenge</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+  <div class="max-w-md mx-auto p-4">
+	<a href="index.html" class="text-blue-600 underline">&larr; Back to Ladder</a>
+
+	<div class="bg-white rounded-xl shadow p-4 mt-4">
+	  <h1 class="text-2xl font-bold mb-4">Submit a Challenge</h1>
+
+	  <form id="challenge-form">
+		<label class="block mb-2 font-semibold" for="challenger">You Are:</label>
+		<select id="challenger" class="w-full p-2 border rounded mb-4">
+		  <option value="Tyler Jones">Tyler Jones</option>
+		  <option value="Hayes Johnson">Hayes Johnson</option>
+		  <option value="Jack Smith">Jack Smith</option>
+		</select>
+
+		<label class="block mb-2 font-semibold" for="opponent">Challenging:</label>
+		<select id="opponent" class="w-full p-2 border rounded mb-4">
+		  <option value="Tyler Jones">Tyler Jones</option>
+		  <option value="Hayes Johnson">Hayes Johnson</option>
+		  <option value="Jack Smith">Jack Smith</option>
+		</select>
+
+		<label class="block mb-2 font-semibold" for="notes">Optional Notes:</label>
+		<textarea id="notes" class="w-full p-2 border rounded mb-4" rows="3" placeholder="Add any special info..."></textarea>
+
+		<button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold">Submit Challenge</button>
+	  </form>
+
+	  <p id="confirmation" class="text-green-600 mt-4 font-medium hidden">Challenge submitted!</p>
+	</div>
+  </div>
+
+  <script>
+	document.getElementById('challenge-form').addEventListener('submit', function(e) {
+	  e.preventDefault();
+	  document.getElementById('confirmation').classList.remove('hidden');
+	});
+  </script>
+</body>
+</html>

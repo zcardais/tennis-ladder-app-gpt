@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Match</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+  <div class="max-w-md mx-auto p-4">
+	<a href="index.html" class="text-blue-600 underline">&larr; Back to Ladder</a>
+
+	<div class="bg-white rounded-xl shadow p-4 mt-4">
+	  <h1 class="text-2xl font-bold mb-4">Report Match Result</h1>
+
+	  <form id="report-form">
+		<label class="block mb-2 font-semibold" for="player1">Player 1:</label>
+		<select id="player1" class="w-full p-2 border rounded mb-4">
+		  <option value="Tyler Jones">Tyler Jones</option>
+		  <option value="Hayes Johnson">Hayes Johnson</option>
+		  <option value="Jack Smith">Jack Smith</option>
+		</select>
+
+		<label class="block mb-2 font-semibold" for="player2">Player 2:</label>
+		<select id="player2" class="w-full p-2 border rounded mb-4">
+		  <option value="Tyler Jones">Tyler Jones</option>
+		  <option value="Hayes Johnson">Hayes Johnson</option>
+		  <option value="Jack Smith">Jack Smith</option>
+		</select>
+
+		<label class="block mb-2 font-semibold" for="score">Final Score:</label>
+		<input id="score" type="text" class="w-full p-2 border rounded mb-4" placeholder="e.g. 6–3, 4–6, 10–7" />
+
+		<button type="submit" class="w-full bg-green-600 text-white py-3 rounded-xl font-semibold">Submit Result</button>
+	  </form>
+
+	  <p id="confirmation" class="text-green-600 mt-4 font-medium hidden">Match result submitted!</p>
+	</div>
+  </div>
+
+  <script>
+	document.getElementById('report-form').addEventListener('submit', function(e) {
+	  e.preventDefault();
+	  document.getElementById('confirmation').classList.remove('hidden');
+	});
+  </script>
+</body>
+</html>
