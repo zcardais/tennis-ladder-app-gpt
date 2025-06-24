@@ -30,41 +30,101 @@
 	</div>
   </div>
 
-  <script>
-	// Simulated player data (replace with Firebase later)
-	const players = {
-	  tyler: {
-		name: "Tyler Jones",
-		rank: 1,
-		matches: [
-		  { opponent: "Jack Smith", result: "Won 6-3, 6-4" },
-		  { opponent: "Hayes Johnson", result: "Lost 5-7, 6-2, 8-10" },
-		],
-	  },
-	  hayes: {
-		name: "Hayes Johnson",
-		rank: 3,
-		matches: [
-		  { opponent: "Tyler Jones", result: "Won 7-5, 2-6, 10-8" },
-		  { opponent: "Jack Smith", result: "Lost 4-6, 4-6" },
-		],
-	  },
-	};
-
+<script>
 	const urlParams = new URLSearchParams(window.location.search);
 	const id = urlParams.get('id') || 'tyler';
-	const player = players[id];
-
+	const players = JSON.parse(localStorage.getItem('players') || '[]');
+	const challenges = JSON.parse(localStorage.getItem('challenges') || '[]');
+	const player = players.find(p => p.id === id);
+  
+	// Mock "logged in" player
+	const loggedInPlayerId = 'tyler';
+  
 	if (player) {
 	  document.getElementById('player-name').textContent = player.name;
 	  document.getElementById('player-rank').textContent = `Rank: #${player.rank}`;
-	  const list = document.getElementById('match-history');
-	  player.matches.forEach(match => {
-		const li = document.createElement('li');
-		li.className = "border-b pb-1 flex justify-between";
-		li.innerHTML = `<span>vs ${match.opponent}</span><span>${match.result}</span>`;
-		list.appendChild(li);
-	  });
+  
+	  const matchHistory = document.getElementById('match-history');
+	  matchHistory.innerHTML = '<li class="text-gray-500">Match history coming soon...</li>';
+  
+	  // Filter challenges where this player is involved
+	  const relevantChallenges = challenges.filter(c =>
+		c.challenger === id || c.opponent === id
+	  );
+  
+	  // Render challenge status
+	  if (relevantChallenges.length > 0) {
+		const challengeBox = document.createElement('div');
+		challengeBox.className = "mt-6 p-4 bg-white rounded-xl shadow";
+  
+		const header = document.createElement('h2');
+		header.className = "text-xl font-semibold mb-3";
+		header.textContent = "Challenge Activity";
+		challengeBox.appendChild(header);
+  
+		relevantChallenges.forEach(ch => {
+		  const opponentId = ch.challenger === id ? ch.opponent : ch.challenger;
+		  const opponent = players.find(p => p.id === opponentId);
+		  const isChallenger = ch.challenger === id;
+		  const isViewerChallenger = ch.challenger === loggedInPlayerId;
+		  const isViewerOpponent = ch.opponent === loggedInPlayerId;
+  
+		  const line = document.createElement('div');
+		  line.className = "border-b py-2 flex flex-col";
+  
+		  const line1 = document.createElement('div');
+		  line1.className = "flex justify-between items-center";
+		  line1.innerHTML = `
+			<div><strong>${isChallenger ? "Challenged" : "Challenged by"}</strong> ${opponent?.name || opponentId}</div>
+			<div>Status: <span class="font-semibold">${ch.status.toUpperCase()}</span></div>
+		  `;
+  
+		  line.appendChild(line1);
+  
+		  // Buttons: Accept / Deny if viewer is the opponent and it's pending
+		  if (isViewerOpponent && ch.status === 'pending') {
+			const actions = document.createElement('div');
+			actions.className = "mt-2 flex gap-2";
+  
+			const acceptBtn = document.createElement('button');
+			acceptBtn.className = "bg-green-600 text-white px-3 py-1 rounded";
+			acceptBtn.textContent = "Accept";
+			acceptBtn.onclick = () => updateChallengeStatus(ch.id, 'accepted');
+  
+			const denyBtn = document.createElement('button');
+			denyBtn.className = "bg-red-600 text-white px-3 py-1 rounded";
+			denyBtn.textContent = "Deny";
+			denyBtn.onclick = () => updateChallengeStatus(ch.id, 'denied');
+  
+			actions.appendChild(acceptBtn);
+			actions.appendChild(denyBtn);
+			line.appendChild(actions);
+		  }
+  
+		  // Report Score button if viewer is challenger and accepted
+		  if (isViewerChallenger && ch.status === 'accepted') {
+			const report = document.createElement('a');
+			report.href = `report.html?player1=${ch.challenger}&player2=${ch.opponent}`;
+			report.textContent = "Report Score";
+			report.className = "mt-2 inline-block text-center bg-blue-600 text-white px-4 py-2 rounded";
+			line.appendChild(report);
+		  }
+  
+		  challengeBox.appendChild(line);
+		});
+  
+		document.querySelector('.max-w-md').appendChild(challengeBox);
+	  }
+	}
+  
+	function updateChallengeStatus(challengeId, newStatus) {
+	  const challenges = JSON.parse(localStorage.getItem('challenges') || '[]');
+	  const index = challenges.findIndex(c => c.id === challengeId);
+	  if (index !== -1) {
+		challenges[index].status = newStatus;
+		localStorage.setItem('challenges', JSON.stringify(challenges));
+		location.reload();
+	  }
 	}
   </script>
 </body>

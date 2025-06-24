@@ -12,43 +12,51 @@
 
 	<h1 class="text-2xl font-bold mt-4 mb-6">Admin Panel</h1>
 
-	<!-- Challenge Requests -->
+	<!-- Accepted Challenges: Ready for Score Reporting -->
 	<div class="bg-white rounded-xl shadow p-4 mb-6">
-	  <h2 class="text-xl font-semibold mb-3">Pending Challenges</h2>
+	  <h2 class="text-xl font-semibold mb-3">Accepted Challenges</h2>
 	  <ul id="challenges" class="space-y-2">
-		<li class="flex justify-between items-center border-b pb-1">
-		  <span>Hayes vs Jack</span>
-		  <button class="text-sm text-green-600 font-medium hover:underline">Approve</button>
-		</li>
-		<li class="flex justify-between items-center border-b pb-1">
-		  <span>Tyler vs Hayes</span>
-		  <button class="text-sm text-green-600 font-medium hover:underline">Approve</button>
-		</li>
+		<li class="text-gray-500 text-sm">Loading...</li>
 	  </ul>
 	</div>
 
-	<!-- Match Results -->
+	<!-- Match Results (for future editing features) -->
 	<div class="bg-white rounded-xl shadow p-4">
 	  <h2 class="text-xl font-semibold mb-3">Pending Match Results</h2>
 	  <ul id="results" class="space-y-2">
-		<li class="flex justify-between items-center border-b pb-1">
-		  <span>Jack def. Tyler<br><small>6–3, 3–6, 10–7</small></span>
-		  <button class="text-sm text-green-600 font-medium hover:underline">Approve</button>
-		</li>
-		<li class="flex justify-between items-center border-b pb-1">
-		  <span>Hayes def. Jack<br><small>7–5, 6–4</small></span>
-		  <button class="text-sm text-green-600 font-medium hover:underline">Approve</button>
-		</li>
+		<li class="text-gray-500 text-sm">Feature coming soon...</li>
 	  </ul>
 	</div>
   </div>
+
   <script>
-	// Attach click handlers to all approve buttons
-	document.querySelectorAll('button').forEach(button => {
-	  button.addEventListener('click', () => {
-		const li = button.closest('li');
-		li.remove(); // Remove the challenge or result from the list
-	  });
+	const challenges = JSON.parse(localStorage.getItem('challenges') || '[]');
+	const players = JSON.parse(localStorage.getItem('players') || '[]');
+	const playerMap = Object.fromEntries(players.map(p => [p.id, p.name]));
+
+	const list = document.getElementById('challenges');
+	list.innerHTML = ''; // Clear "Loading..."
+
+	const accepted = challenges.filter(c => c.status === 'accepted');
+
+	if (accepted.length === 0) {
+	  list.innerHTML = '<li class="text-gray-500 text-sm">No accepted challenges yet.</li>';
+	}
+
+	accepted.forEach(ch => {
+	  const li = document.createElement('li');
+	  li.className = 'flex justify-between items-center border-b pb-1';
+
+	  const nameText = `${playerMap[ch.challenger] || ch.challenger} vs ${playerMap[ch.opponent] || ch.opponent}`;
+	  li.innerHTML = `
+		<span>${nameText}</span>
+		<a href="report.html?player1=${ch.challenger}&player2=${ch.opponent}"
+		   class="bg-blue-600 text-white px-3 py-1 rounded text-sm">
+		  Report Score
+		</a>
+	  `;
+
+	  list.appendChild(li);
 	});
   </script>
 </body>

@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create New Ladder</title>
+  <title>Create/Edit Ladder</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen text-gray-800">
   <div class="max-w-md mx-auto p-4">
-	<a href="index.html" class="text-blue-600 underline">&larr; Back to Admin Panel</a>
+	<a href="ladders.html" class="text-blue-600 underline">&larr; Back to Ladder List</a>
 
-	<h1 class="text-2xl font-bold mt-4 mb-6">Create New Ladder</h1>
+	<h1 class="text-2xl font-bold mt-4 mb-6" id="form-title">Create New Ladder</h1>
 
 	<form id="ladder-form" class="space-y-4">
 	  <div>
 		<label class="block font-semibold">Ladder Name</label>
-		<input type="text" id="ladder-name" class="w-full p-2 border rounded" placeholder="Summer 2025" required />
+		<input type="text" id="ladder-name" class="w-full p-2 border rounded" required />
 	  </div>
 
 	  <div class="flex gap-4">
@@ -30,18 +30,18 @@
 	  </div>
 
 	  <div>
-		<label class="block font-semibold">Max Active Challenges per Player</label>
+		<label class="block font-semibold">Max Active Challenges</label>
 		<input type="number" id="max-challenges" class="w-full p-2 border rounded" min="1" required />
 	  </div>
 
 	  <div>
-		<label class="block font-semibold">Time to Accept/Deny Challenge (hours)</label>
+		<label class="block font-semibold">Time to Accept (hours)</label>
 		<input type="number" id="accept-time" class="w-full p-2 border rounded" min="1" required />
 	  </div>
 
 	  <div class="flex items-center">
 		<input type="checkbox" id="auto-win" class="mr-2" />
-		<label for="auto-win" class="font-semibold">Auto-cancelled challenges count as wins</label>
+		<label for="auto-win" class="font-semibold">Auto-cancelled counts as win</label>
 	  </div>
 
 	  <div>
@@ -58,26 +58,51 @@
 	  </div>
 
 	  <div>
-		<label class="block font-semibold">Match Format</label>
+		<label class="block font-semibold">Match Type</label>
 		<select id="match-type" class="w-full p-2 border rounded">
 		  <option value="singles">Singles</option>
 		  <option value="doubles">Doubles</option>
 		</select>
 	  </div>
 
-	  <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold">Create Ladder</button>
+	  <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold">Save Ladder</button>
 	</form>
 
 	<div id="confirmation" class="mt-6 text-green-600 font-semibold hidden">
-	  ✅ Ladder created successfully!
+	  ✅ Ladder saved!
 	</div>
   </div>
 
   <script>
-	document.getElementById('ladder-form').addEventListener('submit', function (e) {
+	const form = document.getElementById('ladder-form');
+	const urlParams = new URLSearchParams(window.location.search);
+	const ladderId = urlParams.get('id');
+
+	let ladders = JSON.parse(localStorage.getItem('ladders') || '[]');
+	let isEditMode = false;
+
+	if (ladderId) {
+	  const ladder = ladders.find(l => l.id === ladderId);
+	  if (ladder) {
+		isEditMode = true;
+		document.getElementById('form-title').textContent = 'Edit Ladder';
+		document.getElementById('ladder-name').value = ladder.name;
+		document.getElementById('start-date').value = ladder.startDate;
+		document.getElementById('end-date').value = ladder.endDate;
+		document.getElementById('max-challenges').value = ladder.maxChallenges;
+		document.getElementById('accept-time').value = ladder.acceptTime;
+		document.getElementById('auto-win').checked = ladder.autoWin;
+		document.getElementById('match-deadline').value = ladder.matchDeadline;
+		document.getElementById('ranking-type').value = ladder.rankingType;
+		document.getElementById('match-type').value = ladder.matchType;
+	  }
+	}
+
+	form.addEventListener('submit', function(e) {
 	  e.preventDefault();
 
 	  const data = {
+		id: ladderId || 'ladder-' + Date.now(),
 		name: document.getElementById('ladder-name').value,
 		startDate: document.getElementById('start-date').value,
 		endDate: document.getElementById('end-date').value,
@@ -86,10 +111,17 @@
 		autoWin: document.getElementById('auto-win').checked,
 		matchDeadline: parseInt(document.getElementById('match-deadline').value),
 		rankingType: document.getElementById('ranking-type').value,
-		matchType: document.getElementById('match-type').value,
+		matchType: document.getElementById('match-type').value
 	  };
 
-	  console.log('Ladder Created:', data);
+	  if (isEditMode) {
+		const index = ladders.findIndex(l => l.id === ladderId);
+		if (index !== -1) ladders[index] = data;
+	  } else {
+		ladders.push(data);
+	  }
+
+	  localStorage.setItem('ladders', JSON.stringify(ladders));
 	  document.getElementById('confirmation').classList.remove('hidden');
 	});
   </script>
