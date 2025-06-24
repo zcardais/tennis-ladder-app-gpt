@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Match Scores</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen">
+  <div class="max-w-2xl mx-auto p-4">
+	<a href="index.html" class="text-blue-600 underline">&larr; Back to Home</a>
+	<h1 class="text-2xl font-bold mt-4 mb-6">Match History</h1>
+
+	<div id="match-list" class="space-y-4"></div>
+  </div>
+
+  <script>
+	const players = JSON.parse(localStorage.getItem('players') || '[]');
+	const matches = JSON.parse(localStorage.getItem('matches') || '[]');
+
+	const playerMap = {};
+	players.forEach(p => playerMap[p.id] = p.name);
+
+	const container = document.getElementById('match-list');
+
+	if (matches.length === 0) {
+	  container.innerHTML = `<p class="text-gray-600">No matches reported yet.</p>`;
+	} else {
+	  matches
+		.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+		.forEach(match => {
+		  const p1 = playerMap[match.player1] || match.player1;
+		  const p2 = playerMap[match.player2] || match.player2;
+		  const winner = playerMap[match.winner] || match.winner;
+		  const date = new Date(match.createdAt).toLocaleDateString();
+
+		  const matchCard = document.createElement('div');
+		  matchCard.className = 'bg-white p-4 rounded-xl shadow';
+
+		  matchCard.innerHTML = `
+			<div class="text-sm text-gray-500 mb-1">${date}</div>
+			<div class="font-semibold">${p1} vs ${p2}</div>
+			<div class="text-gray-700">Score: <span class="font-medium">${match.score}</span></div>
+			<div class="text-green-600 font-medium mt-1">Winner: ${winner}</div>
+		  `;
+
+		  container.appendChild(matchCard);
+		});
+	}
+  </script>
+</body>
+</html>

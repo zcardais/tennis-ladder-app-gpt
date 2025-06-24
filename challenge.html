@@ -15,33 +15,60 @@
 
 	  <form id="challenge-form">
 		<label class="block mb-2 font-semibold" for="challenger">You Are:</label>
-		<select id="challenger" class="w-full p-2 border rounded mb-4">
-		  <option value="Tyler Jones">Tyler Jones</option>
-		  <option value="Hayes Johnson">Hayes Johnson</option>
-		  <option value="Jack Smith">Jack Smith</option>
+		<select id="challenger" class="w-full p-2 border rounded mb-4" disabled>
+		  <option value="tyler">Tyler Jones</option>
 		</select>
 
-		<label class="block mb-2 font-semibold" for="opponent">Challenging:</label>
+		<label class="block mb-2 font-semibold" for="opponent">Eligible Opponents:</label>
 		<select id="opponent" class="w-full p-2 border rounded mb-4">
-		  <option value="Tyler Jones">Tyler Jones</option>
-		  <option value="Hayes Johnson">Hayes Johnson</option>
-		  <option value="Jack Smith">Jack Smith</option>
+		  <!-- Filled dynamically -->
 		</select>
 
 		<label class="block mb-2 font-semibold" for="notes">Optional Notes:</label>
-		<textarea id="notes" class="w-full p-2 border rounded mb-4" rows="3" placeholder="Add any special info..."></textarea>
+		<textarea id="notes" class="w-full p-2 border rounded mb-4" rows="3" placeholder="Add match details..."></textarea>
 
 		<button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold">Submit Challenge</button>
 	  </form>
 
-	  <p id="confirmation" class="text-green-600 mt-4 font-medium hidden">Challenge submitted!</p>
+	  <p id="confirmation" class="text-green-600 mt-4 font-medium hidden">✅ Challenge submitted!</p>
 	</div>
   </div>
 
   <script>
-	document.getElementById('challenge-form').addEventListener('submit', function(e) {
+	const loggedInPlayerId = 'tyler'; // placeholder until user auth is built
+	const maxChallengeRange = 2;
+	const ladderId = localStorage.getItem('activeLadderId') || 'ladder-default';
+
+	const players = JSON.parse(localStorage.getItem('players') || '[]');
+	const challenger = players.find(p => p.id === loggedInPlayerId);
+	const eligibleOpponents = players.filter(p =>
+	  p.rank < challenger.rank && p.rank >= (challenger.rank - maxChallengeRange)
+	);
+
+	const opponentSelect = document.getElementById('opponent');
+	eligibleOpponents.forEach(p => {
+	  const opt = new Option(`${p.name} (#${p.rank})`, p.id);
+	  opponentSelect.appendChild(opt);
+	});
+
+	document.getElementById('challenge-form').addEventListener('submit', function (e) {
 	  e.preventDefault();
+
+	  const challenge = {
+		id: 'challenge-' + Date.now(),
+		ladderId,
+		challenger: challenger.id,
+		opponent: opponentSelect.value,
+		status: 'pending',
+		createdAt: new Date().toISOString()
+	  };
+
+	  const challenges = JSON.parse(localStorage.getItem('challenges') || '[]');
+	  challenges.push(challenge);
+	  localStorage.setItem('challenges', JSON.stringify(challenges));
+
 	  document.getElementById('confirmation').classList.remove('hidden');
+	  e.target.reset();
 	});
   </script>
 </body>

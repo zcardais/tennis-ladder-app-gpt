@@ -14,22 +14,17 @@
 	  <h1 class="text-2xl font-bold mb-4">Report Match Result</h1>
 
 	  <form id="report-form">
-		<label class="block mb-2 font-semibold" for="player1">Player 1:</label>
-		<select id="player1" class="w-full p-2 border rounded mb-4">
-		  <option value="Tyler Jones">Tyler Jones</option>
-		  <option value="Hayes Johnson">Hayes Johnson</option>
-		  <option value="Jack Smith">Jack Smith</option>
-		</select>
+		<label class="block mb-2 font-semibold">Player 1:</label>
+		<select id="player1" class="w-full p-2 border rounded mb-4"></select>
 
-		<label class="block mb-2 font-semibold" for="player2">Player 2:</label>
-		<select id="player2" class="w-full p-2 border rounded mb-4">
-		  <option value="Tyler Jones">Tyler Jones</option>
-		  <option value="Hayes Johnson">Hayes Johnson</option>
-		  <option value="Jack Smith">Jack Smith</option>
-		</select>
+		<label class="block mb-2 font-semibold">Player 2:</label>
+		<select id="player2" class="w-full p-2 border rounded mb-4"></select>
 
-		<label class="block mb-2 font-semibold" for="score">Final Score:</label>
-		<input id="score" type="text" class="w-full p-2 border rounded mb-4" placeholder="e.g. 6–3, 4–6, 10–7" />
+		<label class="block mb-2 font-semibold">Final Score:</label>
+		<input id="score" type="text" class="w-full p-2 border rounded mb-4" placeholder="e.g. 6–3, 4–6, 10–7" required />
+
+		<label class="block mb-2 font-semibold">Winner:</label>
+		<select id="winner" class="w-full p-2 border rounded mb-4"></select>
 
 		<button type="submit" class="w-full bg-green-600 text-white py-3 rounded-xl font-semibold">Submit Result</button>
 	  </form>
@@ -39,9 +34,42 @@
   </div>
 
   <script>
-	document.getElementById('report-form').addEventListener('submit', function(e) {
+	const players = JSON.parse(localStorage.getItem('players') || '[]');
+	const ladderId = localStorage.getItem('activeLadderId') || 'ladder-default';
+
+	const p1Select = document.getElementById('player1');
+	const p2Select = document.getElementById('player2');
+	const winnerSelect = document.getElementById('winner');
+
+	players.forEach(p => {
+	  const opt1 = new Option(p.name, p.id);
+	  const opt2 = new Option(p.name, p.id);
+	  const optWin = new Option(p.name, p.id);
+	  p1Select.appendChild(opt1);
+	  p2Select.appendChild(opt2);
+	  winnerSelect.appendChild(optWin);
+	});
+
+	document.getElementById('report-form').addEventListener('submit', function (e) {
 	  e.preventDefault();
+
+	  const match = {
+		id: 'match-' + Date.now(),
+		ladderId,
+		player1: p1Select.value,
+		player2: p2Select.value,
+		score: document.getElementById('score').value,
+		winner: winnerSelect.value,
+		status: 'pending',
+		createdAt: new Date().toISOString()
+	  };
+
+	  const matches = JSON.parse(localStorage.getItem('matches') || '[]');
+	  matches.push(match);
+	  localStorage.setItem('matches', JSON.stringify(matches));
+
 	  document.getElementById('confirmation').classList.remove('hidden');
+	  e.target.reset();
 	});
   </script>
 </body>

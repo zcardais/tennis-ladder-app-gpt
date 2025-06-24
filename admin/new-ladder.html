@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create New Ladder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+  <div class="max-w-md mx-auto p-4">
+	<a href="index.html" class="text-blue-600 underline">&larr; Back to Admin Panel</a>
+
+	<h1 class="text-2xl font-bold mt-4 mb-6">Create New Ladder</h1>
+
+	<form id="ladder-form" class="space-y-4">
+	  <div>
+		<label class="block font-semibold">Ladder Name</label>
+		<input type="text" id="ladder-name" class="w-full p-2 border rounded" placeholder="Summer 2025" required />
+	  </div>
+
+	  <div class="flex gap-4">
+		<div class="flex-1">
+		  <label class="block font-semibold">Start Date</label>
+		  <input type="date" id="start-date" class="w-full p-2 border rounded" required />
+		</div>
+		<div class="flex-1">
+		  <label class="block font-semibold">End Date</label>
+		  <input type="date" id="end-date" class="w-full p-2 border rounded" required />
+		</div>
+	  </div>
+
+	  <div>
+		<label class="block font-semibold">Max Active Challenges per Player</label>
+		<input type="number" id="max-challenges" class="w-full p-2 border rounded" min="1" required />
+	  </div>
+
+	  <div>
+		<label class="block font-semibold">Time to Accept/Deny Challenge (hours)</label>
+		<input type="number" id="accept-time" class="w-full p-2 border rounded" min="1" required />
+	  </div>
+
+	  <div class="flex items-center">
+		<input type="checkbox" id="auto-win" class="mr-2" />
+		<label for="auto-win" class="font-semibold">Auto-cancelled challenges count as wins</label>
+	  </div>
+
+	  <div>
+		<label class="block font-semibold">Time to Complete Match (days)</label>
+		<input type="number" id="match-deadline" class="w-full p-2 border rounded" min="1" required />
+	  </div>
+
+	  <div>
+		<label class="block font-semibold">Ranking System</label>
+		<select id="ranking-type" class="w-full p-2 border rounded">
+		  <option value="fixed">Fixed Position</option>
+		  <option value="points">Points-Based</option>
+		</select>
+	  </div>
+
+	  <div>
+		<label class="block font-semibold">Match Format</label>
+		<select id="match-type" class="w-full p-2 border rounded">
+		  <option value="singles">Singles</option>
+		  <option value="doubles">Doubles</option>
+		</select>
+	  </div>
+
+	  <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold">Create Ladder</button>
+	</form>
+
+	<div id="confirmation" class="mt-6 text-green-600 font-semibold hidden">
+	  ✅ Ladder created successfully!
+	</div>
+  </div>
+
+  <script>
+	document.getElementById('ladder-form').addEventListener('submit', function (e) {
+	  e.preventDefault();
+
+	  const data = {
+		name: document.getElementById('ladder-name').value,
+		startDate: document.getElementById('start-date').value,
+		endDate: document.getElementById('end-date').value,
+		maxChallenges: parseInt(document.getElementById('max-challenges').value),
+		acceptTime: parseInt(document.getElementById('accept-time').value),
+		autoWin: document.getElementById('auto-win').checked,
+		matchDeadline: parseInt(document.getElementById('match-deadline').value),
+		rankingType: document.getElementById('ranking-type').value,
+		matchType: document.getElementById('match-type').value,
+	  };
+
+	  console.log('Ladder Created:', data);
+	  document.getElementById('confirmation').classList.remove('hidden');
+	});
+  </script>
+</body>
+</html>
