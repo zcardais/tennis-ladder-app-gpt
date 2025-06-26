@@ -26,7 +26,9 @@
 
 	<!-- Challenge Button -->
 	<div class="mt-6">
-	  <a href="challenge.html" class="block bg-blue-600 text-white text-center py-3 rounded-xl font-semibold">Challenge This Player</a>
+	  <button onclick="issueChallenge('jack')" class="bg-green-600 text-white px-3 py-1 rounded text-xs">
+		Challenge this Player
+	  </button>
 	</div>
   </div>
 
@@ -125,6 +127,24 @@
 		localStorage.setItem('challenges', JSON.stringify(challenges));
 		location.reload();
 	  }
+	}
+	
+	function issueChallenge(opponentId) {
+	  const ladderId = 'ladder-2025-summer'; // Or dynamically fetch this later
+	  const loggedInPlayerId = 'tyler'; // Replace with your auth system
+	
+	  const challenges = JSON.parse(localStorage.getItem('challenges') || '[]');
+	  const challenge = {
+		id: 'challenge-' + Date.now(),
+		ladderId,
+		challenger: loggedInPlayerId,
+		opponent: opponentId,
+		status: 'pending',
+		createdAt: new Date().toISOString()
+	  };
+	  challenges.push(challenge);
+	  localStorage.setItem('challenges', JSON.stringify(challenges));
+	  alert('✅ Challenge issued!');
 	}
   </script>
 </body>
