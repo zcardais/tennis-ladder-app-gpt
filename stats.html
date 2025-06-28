@@ -3,119 +3,188 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Player Stats</title>
+  <title>Stats</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+	.phone-frame {
+	  width: 100%;
+	  max-width: 375px;
+	  height: 812px;
+	  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	  border-radius: 40px;
+	  overflow: hidden;
+	  position: relative;
+	  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+				  0 10px 10px -5px rgba(0, 0, 0, 0.04);
+	  border: 1px solid #e2e8f0;
+	  margin: 2rem auto;
+	  display: flex;
+	  flex-direction: column;
+	}
+  </style>
 </head>
-<body class="bg-[#F5F7FA] text-gray-800 min-h-screen">
-  <div class="max-w-md mx-auto p-4">
-	<a href="dashboard.html" class="text-blue-600 underline text-sm">&larr; Back to Dashboard</a>
-	<h1 class="text-2xl font-bold mt-4 mb-2">Your Stats</h1>
-
-	<!-- Player Summary -->
-	<div class="bg-white p-4 rounded-xl shadow mb-4">
-	  <div class="text-lg font-semibold" id="player-name">Tyler Jones</div>
-	  <div class="text-sm text-gray-500" id="player-rank">Rank #1</div>
-	  <div class="text-sm text-gray-500">Rating: <span id="player-rating">1520</span></div>
+<body>
+  <div class="phone-frame">
+	<!-- Header -->
+	<div class="bg-white/10 backdrop-blur-sm px-6 py-4 flex items-center justify-between">
+	  <h1 class="text-xl font-bold text-white">Statistics</h1>
 	</div>
 
-	<!-- Stat Toggle -->
-	<div class="flex justify-center mb-4 space-x-4">
-	  <button id="season-btn" class="text-blue-600 font-semibold border-b-2 border-blue-600">This Season</button>
-	  <button id="alltime-btn" class="text-gray-500">All-Time</button>
+	<!-- Player Overview -->
+	<div class="px-6 py-4">
+	  <div class="bg-white/15 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+		<div class="flex items-center space-x-4">
+		  <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
+			<span class="text-white font-bold text-xl">AJ</span>
+		  </div>
+		  <div class="flex-1">
+			<h2 class="text-white font-bold text-lg">Alex Johnson</h2>
+			<div class="flex items-center space-x-4 mt-1">
+			  <div class="text-center">
+				<p class="text-white/70 text-xs">Rank</p>
+				<p class="text-white font-bold">#7</p>
+			  </div>
+			  <div class="text-center">
+				<p class="text-white/70 text-xs">Rating</p>
+				<p class="text-white font-bold">1,245</p>
+			  </div>
+			  <div class="text-center">
+				<p class="text-white/70 text-xs">Record</p>
+				<p class="text-white font-bold">5-8</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	  </div>
 	</div>
 
-	<!-- Stat Grid -->
-	<div class="grid grid-cols-2 gap-4" id="stat-grid">
-	  <div class="bg-white p-4 rounded-xl shadow">
-		<div class="text-sm text-gray-500">Matches</div>
-		<div class="text-xl font-bold" id="total-matches">0</div>
+	<!-- Stats Section -->
+	<div class="flex-1 px-6 pb-6">
+	  <div class="bg-white rounded-2xl shadow-lg h-full overflow-y-auto pb-24">
+		<!-- Tabs -->
+		<div class="p-4 border-b border-gray-100">
+		  <div class="flex space-x-1 bg-gray-100 rounded-lg p-1">
+			<button class="flex-1 py-2 px-4 bg-white text-black rounded-md font-medium text-sm shadow-sm">Season</button>
+			<button class="flex-1 py-2 px-4 text-gray-600 rounded-md font-medium text-sm">All Time</button>
+		  </div>
+		</div>
+
+		<!-- Performance Overview -->
+		<div class="p-4 border-b border-gray-100">
+		  <h3 class="font-semibold text-black mb-3">Performance Overview</h3>
+		  <div class="grid grid-cols-2 gap-4">
+			<div class="bg-green-50 p-3 rounded-lg">
+			  <p class="text-green-800 font-bold text-2xl">5</p>
+			  <p class="text-green-600 text-sm">Wins</p>
+			</div>
+			<div class="bg-red-50 p-3 rounded-lg">
+			  <p class="text-red-800 font-bold text-2xl">8</p>
+			  <p class="text-red-600 text-sm">Losses</p>
+			</div>
+		  </div>
+		</div>
+
+		<!-- Challenge Activity -->
+		<div class="p-4 border-b border-gray-100">
+		  <h3 class="font-semibold text-black mb-3">Challenge Activity</h3>
+		  <div class="space-y-2">
+			<div class="flex justify-between">
+			  <span class="text-gray-600">Challenges Sent</span>
+			  <span class="font-semibold text-black">7</span>
+			</div>
+			<div class="flex justify-between">
+			  <span class="text-gray-600">Challenges Received</span>
+			  <span class="font-semibold text-black">6</span>
+			</div>
+			<div class="flex justify-between">
+			  <span class="text-gray-600">Success Rate (Sent)</span>
+			  <span class="font-semibold text-black">42.9%</span>
+			</div>
+			<div class="flex justify-between">
+			  <span class="text-gray-600">Defense Rate</span>
+			  <span class="font-semibold text-black">33.3%</span>
+			</div>
+		  </div>
+		</div>
+		<!-- Ranking Progress -->
+		<div class="p-4 border-b border-gray-100">
+		  <h3 class="font-semibold text-black mb-3">Ranking Progress</h3>
+		  <div class="space-y-3">
+			<!-- Starting Rank -->
+			<div class="flex items-center justify-between">
+			  <span class="text-gray-600">Starting Rank</span>
+			  <span class="font-semibold text-black">—</span>
+			</div>
+			<!-- Current Rank -->
+			<div class="flex items-center justify-between">
+			  <span class="text-gray-600">Current Rank</span>
+			  <span class="font-semibold text-black">—</span>
+			</div>
+			<!-- Best Rank -->
+			<div class="flex items-center justify-between">
+			  <span class="text-gray-600">Best Rank</span>
+			  <div class="flex items-center space-x-2">
+				<span class="font-semibold text-black">—</span>
+			  </div>
+			</div>
+			<!-- Net Movement -->
+			<div class="flex items-center justify-between">
+			  <span class="text-gray-600">Net Movement</span>
+			  <div class="flex items-center space-x-1">
+				<span class="font-semibold text-black">—</span>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		
+		<!-- Recent Matches -->
+		<div class="p-4">
+		  <h3 class="font-semibold text-black mb-3">Recent Matches</h3>
+		  <div class="space-y-3">
+			<!-- Match items will be injected here -->
+			<div class="p-3 rounded-lg bg-gray-50 text-gray-500 text-sm text-center border border-dashed border-gray-300">
+			  No recent matches to display.
+			</div>
+		  </div>
+		</div>
 	  </div>
-	  <div class="bg-white p-4 rounded-xl shadow">
-		<div class="text-sm text-gray-500">Wins</div>
-		<div class="text-xl font-bold" id="wins">0</div>
-	  </div>
-	  <div class="bg-white p-4 rounded-xl shadow">
-		<div class="text-sm text-gray-500">Losses</div>
-		<div class="text-xl font-bold" id="losses">0</div>
-	  </div>
-	  <div class="bg-white p-4 rounded-xl shadow">
-		<div class="text-sm text-gray-500">Win %</div>
-		<div class="text-xl font-bold" id="win-pct">0%</div>
+	</div>
+
+	<!-- Bottom Navigation -->
+	<div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3">
+	  <div class="flex justify-around">
+		<button class="flex flex-col items-center space-y-1 text-gray-400">
+		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+		  </svg>
+		  <span class="text-xs">Home</span>
+		</button>
+		<button class="flex flex-col items-center space-y-1 text-gray-400">
+		  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+			<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+		  </svg>
+		  <span class="text-xs">Ladders</span>
+		</button>
+		<button class="flex flex-col items-center space-y-1 text-gray-400">
+		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+		  </svg>
+		  <span class="text-xs">Challenges</span>
+		</button>
+		<button class="flex flex-col items-center space-y-1 text-blue-600">
+		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2"/>
+		  </svg>
+		  <span class="text-xs font-medium">Stats</span>
+		</button>
+		<button class="flex flex-col items-center space-y-1 text-gray-400">
+		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+		  </svg>
+		  <span class="text-xs">Profile</span>
+		</button>
 	  </div>
 	</div>
   </div>
-
-  <script>
-	const loggedInPlayerId = 'tyler';
-	const players = JSON.parse(localStorage.getItem('players') || '[]');
-	const challenges = JSON.parse(localStorage.getItem('challenges') || '[]');
-	const player = players.find(p => p.id === loggedInPlayerId);
-
-	document.getElementById('player-name').textContent = player.name;
-	document.getElementById('player-rank').textContent = `Rank #${player.rank}`;
-
-	let isAllTime = false;
-
-	document.getElementById('season-btn').addEventListener('click', () => {
-	  isAllTime = false;
-	  updateButtons();
-	  renderStats();
-	});
-
-	document.getElementById('alltime-btn').addEventListener('click', () => {
-	  isAllTime = true;
-	  updateButtons();
-	  renderStats();
-	});
-
-	function updateButtons() {
-	  document.getElementById('season-btn').classList.toggle('text-blue-600', !isAllTime);
-	  document.getElementById('season-btn').classList.toggle('border-b-2', !isAllTime);
-	  document.getElementById('season-btn').classList.toggle('border-blue-600', !isAllTime);
-	  document.getElementById('season-btn').classList.toggle('text-gray-500', isAllTime);
-
-	  document.getElementById('alltime-btn').classList.toggle('text-blue-600', isAllTime);
-	  document.getElementById('alltime-btn').classList.toggle('border-b-2', isAllTime);
-	  document.getElementById('alltime-btn').classList.toggle('border-blue-600', isAllTime);
-	  document.getElementById('alltime-btn').classList.toggle('text-gray-500', !isAllTime);
-	}
-
-	function renderStats() {
-	  let filtered = challenges.filter(c =>
-		(c.challenger === loggedInPlayerId || c.opponent === loggedInPlayerId) &&
-		c.status === 'completed'
-	  );
-
-	  if (!isAllTime) {
-		const seasonStart = new Date('2025-06-01');
-		filtered = filtered.filter(c => new Date(c.createdAt) >= seasonStart);
-	  }
-
-	  const total = filtered.length;
-	  let wins = 0;
-	  filtered.forEach(c => {
-		const sets = c.score?.sets || [];
-		let p1Wins = 0, p2Wins = 0;
-		sets.forEach(([a, b]) => {
-		  if (a > b) p1Wins++;
-		  else if (b > a) p2Wins++;
-		});
-		const isWinner = (c.challenger === loggedInPlayerId && p1Wins > p2Wins) ||
-						 (c.opponent === loggedInPlayerId && p2Wins > p1Wins);
-		if (isWinner) wins++;
-	  });
-
-	  const losses = total - wins;
-	  const pct = total > 0 ? Math.round((wins / total) * 100) : 0;
-
-	  document.getElementById('total-matches').textContent = total;
-	  document.getElementById('wins').textContent = wins;
-	  document.getElementById('losses').textContent = losses;
-	  document.getElementById('win-pct').textContent = pct + '%';
-	}
-
-	updateButtons();
-	renderStats();
-  </script>
 </body>
 </html>
