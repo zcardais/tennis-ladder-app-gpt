@@ -1,75 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Report Match</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Match Score</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen text-gray-800">
+<body class="bg-[#F5F7FA] text-gray-800 min-h-screen">
   <div class="max-w-md mx-auto p-4">
-	<a href="index.html" class="text-blue-600 underline">&larr; Back to Ladder</a>
+	<a href="dashboard.html" class="text-blue-600 underline text-sm">&larr; Back to Dashboard</a>
 
-	<div class="bg-white rounded-xl shadow p-4 mt-4">
-	  <h1 class="text-2xl font-bold mb-4">Report Match Result</h1>
+	<h1 class="text-2xl font-bold mt-4 mb-6">Report Score</h1>
 
-	  <form id="report-form">
-		<label class="block mb-2 font-semibold">Player 1:</label>
-		<select id="player1" class="w-full p-2 border rounded mb-4"></select>
+	<div id="match-details" class="bg-white p-4 rounded-xl shadow mb-6 hidden">
+	  <h2 class="text-sm font-semibold text-gray-500 mb-2">Match</h2>
+	  <p id="match-summary" class="text-sm"></p>
+	</div>
 
-		<label class="block mb-2 font-semibold">Player 2:</label>
-		<select id="player2" class="w-full p-2 border rounded mb-4"></select>
+	<form id="report-form" class="space-y-4">
+	  <div class="grid grid-cols-2 gap-4">
+		<div>
+		  <label class="block text-sm font-semibold">Set 1</label>
+		  <input type="number" id="set1-you" class="w-full p-2 border rounded" placeholder="You" min="0">
+		</div>
+		<div>
+		  <label class="block text-sm font-semibold text-right">&nbsp;</label>
+		  <input type="number" id="set1-them" class="w-full p-2 border rounded" placeholder="Opponent" min="0">
+		</div>
+	  </div>
 
-		<label class="block mb-2 font-semibold">Final Score:</label>
-		<input id="score" type="text" class="w-full p-2 border rounded mb-4" placeholder="e.g. 6–3, 4–6, 10–7" required />
+	  <div class="grid grid-cols-2 gap-4">
+		<div>
+		  <input type="number" id="set2-you" class="w-full p-2 border rounded" placeholder="You" min="0">
+		</div>
+		<div>
+		  <input type="number" id="set2-them" class="w-full p-2 border rounded" placeholder="Opponent" min="0">
+		</div>
+	  </div>
 
-		<label class="block mb-2 font-semibold">Winner:</label>
-		<select id="winner" class="w-full p-2 border rounded mb-4"></select>
+	  <div class="grid grid-cols-2 gap-4">
+		<div>
+		  <input type="number" id="set3-you" class="w-full p-2 border rounded" placeholder="You" min="0">
+		</div>
+		<div>
+		  <input type="number" id="set3-them" class="w-full p-2 border rounded" placeholder="Opponent" min="0">
+		</div>
+	  </div>
 
-		<button type="submit" class="w-full bg-green-600 text-white py-3 rounded-xl font-semibold">Submit Result</button>
-	  </form>
+	  <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold">
+		Submit Score for Confirmation
+	  </button>
+	</form>
 
-	  <p id="confirmation" class="text-green-600 mt-4 font-medium hidden">Match result submitted!</p>
+	<div id="confirmation" class="mt-6 text-green-600 font-semibold hidden">
+	  ✅ Score submitted!
 	</div>
   </div>
 
   <script>
+	const loggedInPlayerId = 'tyler';
 	const players = JSON.parse(localStorage.getItem('players') || '[]');
-	const ladderId = localStorage.getItem('activeLadderId') || 'ladder-default';
+	const challenges = JSON.parse(localStorage.getItem('challenges') || '[]');
+	const urlParams = new URLSearchParams(window.location.search);
+	const challengeId = urlParams.get('challengeId');
+	const challenge = challenges.find(c => c.id === challengeId);
 
-	const p1Select = document.getElementById('player1');
-	const p2Select = document.getElementById('player2');
-	const winnerSelect = document.getElementById('winner');
+	const form = document.getElementById('report-form');
+	const matchDetails = document.getElementById('match-details');
+	const matchSummary = document.getElementById('match-summary');
+	const confirmation = document.getElementById('confirmation');
 
-	players.forEach(p => {
-	  const opt1 = new Option(p.name, p.id);
-	  const opt2 = new Option(p.name, p.id);
-	  const optWin = new Option(p.name, p.id);
-	  p1Select.appendChild(opt1);
-	  p2Select.appendChild(opt2);
-	  winnerSelect.appendChild(optWin);
-	});
+	if (challenge) {
+	  const opponentId = challenge.challenger === loggedInPlayerId ? challenge.opponent : challenge.challenger;
+	  const opponent = players.find(p => p.id === opponentId);
+	  matchDetails.classList.remove('hidden');
+	  matchSummary.textContent = `${players.find(p => p.id === challenge.challenger).name} vs ${players.find(p => p.id === challenge.opponent).name}`;
+	}
 
-	document.getElementById('report-form').addEventListener('submit', function (e) {
+	form.addEventListener('submit', function (e) {
 	  e.preventDefault();
 
-	  const match = {
-		id: 'match-' + Date.now(),
-		ladderId,
-		player1: p1Select.value,
-		player2: p2Select.value,
-		score: document.getElementById('score').value,
-		winner: winnerSelect.value,
-		status: 'pending',
-		createdAt: new Date().toISOString()
+	  const score = {
+		challengeId,
+		sets: [
+		  [parseInt(document.getElementById('set1-you').value || 0), parseInt(document.getElementById('set1-them').value || 0)],
+		  [parseInt(document.getElementById('set2-you').value || 0), parseInt(document.getElementById('set2-them').value || 0)],
+		  [parseInt(document.getElementById('set3-you').value || 0), parseInt(document.getElementById('set3-them').value || 0)]
+		]
 	  };
 
-	  const matches = JSON.parse(localStorage.getItem('matches') || '[]');
-	  matches.push(match);
-	  localStorage.setItem('matches', JSON.stringify(matches));
-
-	  document.getElementById('confirmation').classList.remove('hidden');
-	  e.target.reset();
+	  // Attach score to challenge record
+	  const index = challenges.findIndex(c => c.id === challengeId);
+	  if (index !== -1) {
+		challenges[index].score = score;
+		challenges[index].status = 'completed';
+		localStorage.setItem('challenges', JSON.stringify(challenges));
+		confirmation.classList.remove('hidden');
+	  }
 	});
   </script>
 </body>
