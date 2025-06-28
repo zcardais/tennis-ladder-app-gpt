@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Player Stats</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#F5F7FA] text-gray-800 min-h-screen">
+  <div class="max-w-md mx-auto p-4">
+	<a href="dashboard.html" class="text-blue-600 underline text-sm">&larr; Back to Dashboard</a>
+	<h1 class="text-2xl font-bold mt-4 mb-2">Your Stats</h1>
+
+	<!-- Player Summary -->
+	<div class="bg-white p-4 rounded-xl shadow mb-4">
+	  <div class="text-lg font-semibold" id="player-name">Tyler Jones</div>
+	  <div class="text-sm text-gray-500" id="player-rank">Rank #1</div>
+	  <div class="text-sm text-gray-500">Rating: <span id="player-rating">1520</span></div>
+	</div>
+
+	<!-- Stat Toggle -->
+	<div class="flex justify-center mb-4 space-x-4">
+	  <button id="season-btn" class="text-blue-600 font-semibold border-b-2 border-blue-600">This Season</button>
+	  <button id="alltime-btn" class="text-gray-500">All-Time</button>
+	</div>
+
+	<!-- Stat Grid -->
+	<div class="grid grid-cols-2 gap-4" id="stat-grid">
+	  <div class="bg-white p-4 rounded-xl shadow">
+		<div class="text-sm text-gray-500">Matches</div>
+		<div class="text-xl font-bold" id="total-matches">0</div>
+	  </div>
+	  <div class="bg-white p-4 rounded-xl shadow">
+		<div class="text-sm text-gray-500">Wins</div>
+		<div class="text-xl font-bold" id="wins">0</div>
+	  </div>
+	  <div class="bg-white p-4 rounded-xl shadow">
+		<div class="text-sm text-gray-500">Losses</div>
+		<div class="text-xl font-bold" id="losses">0</div>
+	  </div>
+	  <div class="bg-white p-4 rounded-xl shadow">
+		<div class="text-sm text-gray-500">Win %</div>
+		<div class="text-xl font-bold" id="win-pct">0%</div>
+	  </div>
+	</div>
+  </div>
+
+  <script>
+	const loggedInPlayerId = 'tyler';
+	const players = JSON.parse(localStorage.getItem('players') || '[]');
+	const challenges = JSON.parse(localStorage.getItem('challenges') || '[]');
+	const player = players.find(p => p.id === loggedInPlayerId);
+
+	document.getElementById('player-name').textContent = player.name;
+	document.getElementById('player-rank').textContent = `Rank #${player.rank}`;
+
+	let isAllTime = false;
+
+	document.getElementById('season-btn').addEventListener('click', () => {
+	  isAllTime = false;
+	  updateButtons();
+	  renderStats();
+	});
+
+	document.getElementById('alltime-btn').addEventListener('click', () => {
+	  isAllTime = true;
+	  updateButtons();
+	  renderStats();
+	});
+
+	function updateButtons() {
+	  document.getElementById('season-btn').classList.toggle('text-blue-600', !isAllTime);
+	  document.getElementById('season-btn').classList.toggle('border-b-2', !isAllTime);
+	  document.getElementById('season-btn').classList.toggle('border-blue-600', !isAllTime);
+	  document.getElementById('season-btn').classList.toggle('text-gray-500', isAllTime);
+
+	  document.getElementById('alltime-btn').classList.toggle('text-blue-600', isAllTime);
+	  document.getElementById('alltime-btn').classList.toggle('border-b-2', isAllTime);
+	  document.getElementById('alltime-btn').classList.toggle('border-blue-600', isAllTime);
+	  document.getElementById('alltime-btn').classList.toggle('text-gray-500', !isAllTime);
+	}
+
+	function renderStats() {
+	  let filtered = challenges.filter(c =>
+		(c.challenger === loggedInPlayerId || c.opponent === loggedInPlayerId) &&
+		c.status === 'completed'
+	  );
+
+	  if (!isAllTime) {
+		const seasonStart = new Date('2025-06-01');
+		filtered = filtered.filter(c => new Date(c.createdAt) >= seasonStart);
+	  }
+
+	  const total = filtered.length;
+	  let wins = 0;
+	  filtered.forEach(c => {
+		const sets = c.score?.sets || [];
+		let p1Wins = 0, p2Wins = 0;
+		sets.forEach(([a, b]) => {
+		  if (a > b) p1Wins++;
+		  else if (b > a) p2Wins++;
+		});
+		const isWinner = (c.challenger === loggedInPlayerId && p1Wins > p2Wins) ||
+						 (c.opponent === loggedInPlayerId && p2Wins > p1Wins);
+		if (isWinner) wins++;
+	  });
+
+	  const losses = total - wins;
+	  const pct = total > 0 ? Math.round((wins / total) * 100) : 0;
+
+	  document.getElementById('total-matches').textContent = total;
+	  document.getElementById('wins').textContent = wins;
+	  document.getElementById('losses').textContent = losses;
+	  document.getElementById('win-pct').textContent = pct + '%';
+	}
+
+	updateButtons();
+	renderStats();
+  </script>
+</body>
+</html>

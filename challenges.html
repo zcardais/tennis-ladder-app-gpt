@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Challenges</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#F5F7FA] text-gray-800 min-h-screen">
+  <div class="max-w-md mx-auto p-4">
+	<a href="dashboard.html" class="text-blue-600 underline text-sm">&larr; Back to Dashboard</a>
+	<h1 class="text-2xl font-bold mt-4 mb-4">Challenges</h1>
+
+	<!-- Tab Navigation -->
+	<div class="flex space-x-4 text-sm font-semibold mb-4">
+	  <button id="tab-pending" class="text-blue-600 border-b-2 border-blue-600">Pending</button>
+	  <button id="tab-sent" class="text-gray-500">Sent</button>
+	  <button id="tab-history" class="text-gray-500">History</button>
+	</div>
+
+	<ul id="challenge-list" class="space-y-3"></ul>
+  </div>
+
+  <script>
+	const loggedInPlayerId = 'tyler';
+	const players = JSON.parse(localStorage.getItem('players') || '[]');
+	const challenges = JSON.parse(localStorage.getItem('challenges') || '[]');
+	const challengeList = document.getElementById('challenge-list');
+
+	const tabButtons = {
+	  pending: document.getElementById('tab-pending'),
+	  sent: document.getElementById('tab-sent'),
+	  history: document.getElementById('tab-history')
+	};
+
+	function renderChallenges(view) {
+	  challengeList.innerHTML = '';
+	  let filtered = [];
+
+	  if (view === 'pending') {
+		filtered = challenges.filter(c => c.opponent === loggedInPlayerId && c.status === 'pending');
+	  } else if (view === 'sent') {
+		filtered = challenges.filter(c => c.challenger === loggedInPlayerId);
+	  } else if (view === 'history') {
+		filtered = challenges.filter(c =>
+		  (c.challenger === loggedInPlayerId || c.opponent === loggedInPlayerId) &&
+		  (c.status === 'completed' || c.status === 'denied')
+		);
+	  }
+
+	  if (filtered.length === 0) {
+		challengeList.innerHTML = '<li class="text-sm text-gray-500">No challenges found.</li>';
+		return;
+	  }
+
+	  filtered.forEach(c => {
+		const youChallengedThem = c.challenger === loggedInPlayerId;
+		const opponentId = youChallengedThem ? c.opponent : c.challenger;
+		const opponent = players.find(p => p.id === opponentId);
+
+		let statusHTML = `<div class="text-xs text-gray-500">Status: ${c.status}</div>`;
+		let actionHTML = '';
+
+		if (view === 'pending') {
+		  actionHTML = `
+			<div class="mt-1 space-x-2">
+			  <button onclick="updateChallenge('${c.id}', 'accepted')" class="text-xs bg-green-600 text-white px-2 py-1 rounded">Accept</button>
+			  <button onclick="updateChallenge('${c.id}', 'denied')" class="text-xs bg-red-600 text-white px-2 py-1 rounded">Deny</button>
+			</div>`;
+		} else if (view === 'sent' && c.status === 'accepted') {
+		  actionHTML = `
+			<a href="report.html?challengeId=${c.id}" class="text-xs inline-block mt-1 bg-blue-600 text-white px-2 py-1 rounded">Report Score</a>`;
+		}
+
+		const li = document.createElement('li');
+		li.className = "bg-white p-4 rounded-xl shadow text-sm";
+		li.innerHTML = `
+		  <div><strong>${youChallengedThem ? 'You' : opponent.name}</strong> challenged <strong>${youChallengedThem ? opponent.name : 'you'}</strong></div>
+		  ${statusHTML}
+		  ${actionHTML}
+		`;
+		challengeList.appendChild(li);
+	  });
+	}
+
+	function activateTab(view) {
+	  Object.keys(tabButtons).forEach(key => {
+		tabButtons[key].classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+		tabButtons[key].classList.add('text-gray-500');
+	  });
+	  tabButtons[view].classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+	  tabButtons[view].classList.remove('text-gray-500');
+	  renderChallenges(view);
+	}
+
+	tabButtons.pending.addEventListener('click', () => activateTab('pending'));
+	tabButtons.sent.addEventListener('click', () => activateTab('sent'));
+	tabButtons.history.addEventListener('click', () => activateTab('history'));
+
+	function updateChallenge(id, status) {
+	  const index = challenges.findIndex(c => c.id === id);
+	  if (index !== -1) {
+		challenges[index].status = status;
+		localStorage.setItem('challenges', JSON.stringify(challenges));
+		renderChallenges('pending');
+	  }
+	}
+
+	// Initial load
+	activateTab('pending');
+  </script>
+</body>
+</html>
