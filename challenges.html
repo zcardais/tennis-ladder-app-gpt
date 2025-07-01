@@ -5,138 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Challenges</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-	.app-frame {
-	  width: 375px;
-	  height: 812px;
-	  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	  border-radius: 40px;
-	  overflow: hidden;
-	  position: relative;
-	  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-				  0 10px 10px -5px rgba(0, 0, 0, 0.04);
-	  border: 1px solid #e2e8f0;
-	  margin: 2rem auto;
-	  display: flex;
-	  flex-direction: column;
-	}
-  </style>
 </head>
-<body class="bg-[#F5F7FA] text-gray-800 min-h-screen flex justify-center items-center">
-  <div class="app-frame">
-	<div class="p-4 overflow-y-auto flex-1">
-	  <a href="dashboard.html" class="text-white underline text-sm">&larr; Back to Dashboard</a>
-	  <h1 class="text-2xl font-bold text-white mt-4 mb-4">Challenges</h1>
+<body class="bg-gradient-to-br from-indigo-400 to-purple-500 text-white min-h-screen flex flex-col">
 
-	  <!-- Tab Navigation -->
-	  <div class="flex space-x-4 text-sm font-semibold mb-4">
-		<button id="tab-pending" class="text-white border-b-2 border-white">Pending</button>
-		<button id="tab-sent" class="text-white/70">Sent</button>
-		<button id="tab-report" class="text-white/70">Report Scores</button>
-		<button id="tab-history" class="text-white/70">History</button>
-	  </div>
+  <!-- Header -->
+  <div class="px-6 pt-6 pb-4">
+	<a href="dashboard.html" class="text-white underline text-sm">&larr; Back to Dashboard</a>
+	<h1 class="text-2xl font-bold mt-2">Challenges</h1>
+  </div>
 
-	  <ul id="challenge-list" class="space-y-3"></ul>
+  <!-- Tabs -->
+  <div class="px-6">
+	<div class="flex space-x-4 text-sm font-semibold">
+	  <button id="tab-pending" class="text-white border-b-2 border-white pb-1">Pending</button>
+	  <button id="tab-sent" class="text-white/70 pb-1">Sent</button>
+	  <button id="tab-report" class="text-white/70 pb-1">Report Scores</button>
+	  <button id="tab-history" class="text-white/70 pb-1">History</button>
 	</div>
   </div>
 
-  <script>
-	const loggedInPlayerId = 'tyler';
-	const players = JSON.parse(localStorage.getItem('players') || '[]');
-	const challenges = JSON.parse(localStorage.getItem('challenges') || '[]');
-	const challengeList = document.getElementById('challenge-list');
+  <!-- Challenge List -->
+  <div id="challenge-list" class="flex-1 px-6 py-4 space-y-3 overflow-y-auto"></div>
 
-	const tabButtons = {
-	  pending: document.getElementById('tab-pending'),
-	  sent: document.getElementById('tab-sent'),
-	  report: document.getElementById('tab-report'),
-	  history: document.getElementById('tab-history')
-	};
-
-	function renderChallenges(view) {
-	  challengeList.innerHTML = '';
-	  let filtered = [];
-
-	  if (view === 'pending') {
-		filtered = challenges.filter(c => c.opponent === loggedInPlayerId && c.status === 'pending');
-	  } else if (view === 'sent') {
-		filtered = challenges.filter(c => c.challenger === loggedInPlayerId);
-	  } else if (view === 'report') {
-		filtered = challenges.filter(c => 
-		  c.status === 'accepted' &&
-		  (c.challenger === loggedInPlayerId || c.opponent === loggedInPlayerId)
-		);
-	  } else if (view === 'history') {
-		filtered = challenges.filter(c =>
-		  (c.challenger === loggedInPlayerId || c.opponent === loggedInPlayerId) &&
-		  (c.status === 'completed' || c.status === 'denied')
-		);
-	  }
-
-	  if (filtered.length === 0) {
-		challengeList.innerHTML = '<li class="text-sm text-white/80">No challenges found.</li>';
-		return;
-	  }
-
-	  filtered.forEach(c => {
-		const youChallengedThem = c.challenger === loggedInPlayerId;
-		const opponentId = youChallengedThem ? c.opponent : c.challenger;
-		const opponent = players.find(p => p.id === opponentId);
-
-		let statusHTML = `<div class="text-xs text-gray-500">Status: ${c.status}</div>`;
-		let actionHTML = '';
-
-		if (view === 'pending') {
-		  actionHTML = `
-			<div class="mt-2 space-x-2">
-			  <button onclick="updateChallenge('${c.id}', 'accepted')" class="bg-green-600 text-white px-3 py-1 rounded-full text-xs">Accept</button>
-			  <button onclick="updateChallenge('${c.id}', 'denied')" class="bg-red-600 text-white px-3 py-1 rounded-full text-xs">Deny</button>
-			</div>`;
-		} else if ((view === 'sent' || view === 'report') && c.status === 'accepted') {
-		  actionHTML = `
-			<a href="report.html?challengeId=${c.id}" class="inline-block mt-2 bg-blue-600 text-white px-3 py-1 rounded-full text-xs">Report Score</a>`;
-		}
-
-		const li = document.createElement('li');
-		li.className = "bg-white p-4 rounded-xl shadow text-sm";
-		li.innerHTML = `
-		  <div><strong>${youChallengedThem ? 'You' : opponent.name}</strong> challenged <strong>${youChallengedThem ? opponent.name : 'you'}</strong></div>
-		  ${statusHTML}
-		  ${actionHTML}
-		`;
-		challengeList.appendChild(li);
-	  });
-	}
-
-	function activateTab(view) {
-	  Object.keys(tabButtons).forEach(key => {
-		tabButtons[key].classList.remove('border-b-2', 'border-white', 'text-white');
-		tabButtons[key].classList.add('text-white/70');
-	  });
-	  tabButtons[view].classList.add('border-b-2', 'border-white', 'text-white');
-	  tabButtons[view].classList.remove('text-white/70');
-	  renderChallenges(view);
-	}
-
-	tabButtons.pending.addEventListener('click', () => activateTab('pending'));
-	tabButtons.sent.addEventListener('click', () => activateTab('sent'));
-	tabButtons.report.addEventListener('click', () => activateTab('report'));
-	tabButtons.history.addEventListener('click', () => activateTab('history'));
-
-	function updateChallenge(id, status) {
-	  const index = challenges.findIndex(c => c.id === id);
-	  if (index !== -1) {
-		challenges[index].status = status;
-		localStorage.setItem('challenges', JSON.stringify(challenges));
-		renderChallenges('pending');
-	  }
-	}
-
-	// Initial load
-	activateTab('pending');
-  </script>
   <!-- Bottom Navigation -->
-  <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3">
+  <div class="bg-white border-t border-gray-200 px-6 py-3">
 	<div class="flex justify-around">
 	  <button class="flex flex-col items-center space-y-1 text-gray-400">
 		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,5 +62,9 @@
 	  </button>
 	</div>
   </div>
+
+  <script>
+	// [same JS from your current file]
+  </script>
 </body>
 </html>

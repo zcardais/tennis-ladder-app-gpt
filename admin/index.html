@@ -6,106 +6,64 @@
   <title>Admin Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-indigo-500 to-purple-600 min-h-screen text-gray-900">
-  <div class="max-w-sm mx-auto my-4 p-4 bg-white/10 rounded-2xl shadow-xl backdrop-blur-sm border border-white/20">
-	<!-- Header -->
-	<div class="flex items-center justify-between mb-4">
-	  <h1 class="text-xl font-bold text-white">Admin Dashboard</h1>
-	  <button class="p-2 bg-white/20 rounded-full">
-		<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01" />
-		</svg>
-	  </button>
-	</div>
+<body class="bg-gradient-to-br from-indigo-400 to-purple-500 text-white min-h-screen flex flex-col">
 
-	<!-- Quick Stats -->
-	<div class="grid grid-cols-3 gap-3 mb-6">
-	  <div class="bg-white/20 rounded-xl p-3 text-center text-white">
-		<p class="text-sm">Ladders</p>
-		<p class="text-lg font-bold">3</p>
+  <!-- Header -->
+  <div class="px-6 pt-6 pb-4">
+	<h1 class="text-2xl font-bold">Admin Dashboard</h1>
+	<p class="text-sm text-white/80">Overview of system status</p>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="px-6 py-4 space-y-4 flex-1 overflow-y-auto">
+	<div class="grid grid-cols-2 gap-4">
+	  <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+		<p class="text-sm text-white/80">Total Players</p>
+		<p class="text-2xl font-bold">48</p>
 	  </div>
-	  <div class="bg-white/20 rounded-xl p-3 text-center text-white">
-		<p class="text-sm">Players</p>
-		<p class="text-lg font-bold">47</p>
-	  </div>
-	  <div class="bg-white/20 rounded-xl p-3 text-center text-white">
-		<p class="text-sm">Pending</p>
-		<p class="text-lg font-bold">5</p>
+	  <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+		<p class="text-sm text-white/80">Active Ladders</p>
+		<p class="text-2xl font-bold">6</p>
 	  </div>
 	</div>
 
-	<!-- Quick Actions -->
-	<div class="mb-6">
-	  <h2 class="text-white text-sm font-semibold mb-2">Quick Actions</h2>
-	  <div class="grid grid-cols-2 gap-3">
-		<button class="bg-white rounded-xl p-3 flex flex-col items-center justify-center">
-		  <svg class="w-6 h-6 text-indigo-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-		  </svg>
-		  <span class="text-sm font-medium">Create Ladder</span>
-		</button>
-		<button class="bg-white rounded-xl p-3 flex flex-col items-center justify-center">
-		  <svg class="w-6 h-6 text-indigo-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-		  </svg>
-		  <span class="text-sm font-medium">Add Player</span>
-		</button>
-	  </div>
-	</div>
-
-	<!-- Active Ladders -->
-	<div class="mb-6">
-	  <h2 class="text-white text-sm font-semibold mb-2">Active Ladders</h2>
-	  <div class="space-y-3">
-		<div class="bg-white rounded-xl p-3">
-		  <h3 class="text-sm font-bold">Summer 2025</h3>
-		  <p class="text-xs text-gray-500 mb-1">May 1 - Aug 31</p>
-		  <div class="flex justify-between text-xs text-gray-600">
-			<span>18 players</span>
-			<span>12 matches</span>
-			<span>14 days left</span>
-		  </div>
-		</div>
-		<div class="bg-white rounded-xl p-3">
-		  <h3 class="text-sm font-bold">Spring Youth Ladder</h3>
-		  <p class="text-xs text-gray-500 mb-1">Mar 15 - Jun 15</p>
-		  <div class="flex justify-between text-xs text-gray-600">
-			<span>22 players</span>
-			<span>30 matches</span>
-			<span>Ended</span>
-		  </div>
-		</div>
-	  </div>
-	</div>
-
-	<!-- Recent Activity -->
-	<div class="mb-6">
-	  <h2 class="text-white text-sm font-semibold mb-2">Recent Activity</h2>
-	  <ul class="space-y-2 text-sm text-white/90">
-		<li class="bg-white/10 px-3 py-2 rounded-xl">✅ Match reported: Sarah vs Lily</li>
-		<li class="bg-white/10 px-3 py-2 rounded-xl">👤 New player joined: James</li>
-		<li class="bg-white/10 px-3 py-2 rounded-xl">⚙️ Ladder settings updated</li>
+	<div class="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+	  <h2 class="text-lg font-semibold mb-2">Recent Activity</h2>
+	  <ul class="space-y-1 text-sm">
+		<li>✔️ John Doe reported a score</li>
+		<li>📨 New challenge from Sarah to Mike</li>
+		<li>🎯 Ladder "Summer Open" created</li>
 	  </ul>
 	</div>
 
-	<!-- System Status -->
-	<div>
-	  <h2 class="text-white text-sm font-semibold mb-2">System Status</h2>
-	  <ul class="text-sm text-white/80 space-y-1">
-		<li class="flex justify-between">
-		  <span>Server</span><span class="text-green-400">● Online</span>
-		</li>
-		<li class="flex justify-between">
-		  <span>Database</span><span class="text-green-400">● Connected</span>
-		</li>
-		<li class="flex justify-between">
-		  <span>Notifications</span><span class="text-yellow-300">● Delayed</span>
-		</li>
-		<li class="flex justify-between">
-		  <span>Backups</span><span class="text-green-400">● Up-to-date</span>
-		</li>
-	  </ul>
+	<div class="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+	  <h2 class="text-lg font-semibold mb-2">Quick Links</h2>
+	  <div class="grid grid-cols-2 gap-4 text-sm">
+		<a href="ladders.html" class="bg-white/10 py-2 px-3 rounded-lg text-center hover:bg-white/20">Manage Ladders</a>
+		<a href="matches.html" class="bg-white/10 py-2 px-3 rounded-lg text-center hover:bg-white/20">Manage Matches</a>
+		<a href="#" class="bg-white/10 py-2 px-3 rounded-lg text-center hover:bg-white/20">Add Player</a>
+		<a href="#" class="bg-white/10 py-2 px-3 rounded-lg text-center hover:bg-white/20">View Logs</a>
+	  </div>
 	</div>
   </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bg-white border-t border-gray-200 px-6 py-3">
+	<div class="flex justify-around">
+	  <button class="flex flex-col items-center space-y-1 text-blue-600">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+		</svg>
+		<span class="text-xs font-medium">Dashboard</span>
+	  </button>
+	  <button class="flex flex-col items-center space-y-1 text-gray-400">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zM9 17V7a2 2 0 012-2h2a2 2 0 012 2v10m0 0a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v10"/>
+		</svg>
+		<span class="text-xs">Ladders</span>
+	  </button>
+	</div>
+  </div>
+
 </body>
 </html>
