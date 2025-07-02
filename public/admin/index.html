@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-indigo-400 to-purple-500 text-white min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <div class="px-6 pt-6 pb-4">
+	<h1 class="text-2xl font-bold">Admin Dashboard</h1>
+	<p class="text-sm text-white/80">Overview of system status</p>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div class="px-6 py-4 space-y-4 flex-1 overflow-y-auto">
+	<div class="grid grid-cols-2 gap-4">
+	  <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+		<p class="text-sm text-white/80">Total Players</p>
+		<p class="text-2xl font-bold">48</p>
+	  </div>
+	  <div class="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+		<p class="text-sm text-white/80">Active Ladders</p>
+		<p class="text-2xl font-bold">6</p>
+	  </div>
+	</div>
+
+	<div class="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+	  <h2 class="text-lg font-semibold mb-2">Recent Activity</h2>
+	  <ul class="space-y-1 text-sm">
+		<li>✔️ John Doe reported a score</li>
+		<li>📨 New challenge from Sarah to Mike</li>
+		<li>🎯 Ladder "Summer Open" created</li>
+	  </ul>
+	</div>
+
+	<div class="bg-white/20 backdrop-blur-sm rounded-xl p-4">
+	  <h2 class="text-lg font-semibold mb-2">Quick Links</h2>
+	  <div class="grid grid-cols-2 gap-4 text-sm">
+		<a href="ladders.html" class="bg-white/10 py-2 px-3 rounded-lg text-center hover:bg-white/20">Manage Ladders</a>
+		<a href="matches.html" class="bg-white/10 py-2 px-3 rounded-lg text-center hover:bg-white/20">Manage Matches</a>
+		<a href="#" class="bg-white/10 py-2 px-3 rounded-lg text-center hover:bg-white/20">Add Player</a>
+		<a href="#" class="bg-white/10 py-2 px-3 rounded-lg text-center hover:bg-white/20">View Logs</a>
+	  </div>
+	</div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bg-white border-t border-gray-200 px-6 py-3">
+	<div class="flex justify-around">
+	  <button class="flex flex-col items-center space-y-1 text-blue-600">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+		</svg>
+		<span class="text-xs font-medium">Dashboard</span>
+	  </button>
+	  <button class="flex flex-col items-center space-y-1 text-gray-400">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zM9 17V7a2 2 0 012-2h2a2 2 0 012 2v10m0 0a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v10"/>
+		</svg>
+		<span class="text-xs">Ladders</span>
+	  </button>
+	</div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+
+</body>
+</html>

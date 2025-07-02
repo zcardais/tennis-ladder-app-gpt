@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Admin - Manage Ladders</title>
+	<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+	<style>
+	  body {
+		background: linear-gradient(to right, #667eea, #764ba2);
+	  }
+	</style>
+  </head>
+  <body class="min-h-screen text-gray-900">
+	<div class="max-w-3xl mx-auto px-4 py-8">
+	  <header class="mb-8">
+		<h1 class="text-3xl font-bold text-white">Manage Ladders</h1>
+		<p class="text-white/80">View, activate, or archive ladders below.</p>
+	  </header>
+
+	  <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+		<div id="ladder-list" class="divide-y divide-gray-100">
+		  <!-- JS will inject ladders here -->
+		</div>
+	  </div>
+
+	  <div class="mt-6 text-center">
+		<a href="new-ladder.html" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold shadow hover:bg-blue-700 transition">+ Create New Ladder</a>
+	  </div>
+	</div>
+
+	<script>
+	  const ladderListEl = document.getElementById('ladder-list');
+	  const ladders = JSON.parse(localStorage.getItem('ladders') || '[]');
+	  const activeId = localStorage.getItem('activeLadderId');
+
+	  function renderLadders() {
+		ladderListEl.innerHTML = '';
+
+		if (ladders.length === 0) {
+		  ladderListEl.innerHTML = '<p class="p-6 text-gray-600">No ladders found.</p>';
+		  return;
+		}
+
+		ladders.forEach((ladder, index) => {
+		  const isActive = ladder.id === activeId;
+		  const div = document.createElement('div');
+		  div.className = 'px-6 py-4';
+
+		  div.innerHTML = `
+			<div class="flex justify-between items-start">
+			  <div>
+				<h2 class="text-lg font-semibold">${ladder.name}</h2>
+				<p class="text-sm text-gray-600">${ladder.startDate} → ${ladder.endDate}</p>
+				<p class="text-sm ${isActive ? 'text-green-600' : 'text-gray-500'} mt-1">
+				  ${isActive ? 'Active Ladder' : 'Inactive'}
+				</p>
+			  </div>
+			  <div class="space-y-1 text-right">
+				<button onclick="setActive('${ladder.id}')" class="text-sm text-blue-600 hover:underline">Set Active</button><br/>
+				<button onclick="editLadder('${ladder.id}')" class="text-sm text-purple-600 hover:underline">Edit</button><br/>
+				<button onclick="archiveLadder(${index})" class="text-sm text-red-600 hover:underline">Archive</button>
+			  </div>
+			</div>
+		  `;
+
+		  ladderListEl.appendChild(div);
+		});
+	  }
+
+	  function setActive(id) {
+		localStorage.setItem('activeLadderId', id);
+		renderLadders();
+	  }
+
+	  function editLadder(id) {
+		window.location.href = `new-ladder.html?id=${id}`;
+	  }
+
+	  function archiveLadder(index) {
+		if (confirm('Are you sure you want to archive this ladder?')) {
+		  ladders.splice(index, 1);
+		  localStorage.setItem('ladders', JSON.stringify(ladders));
+		  renderLadders();
+		}
+	  }
+
+	  renderLadders();
+	</script>
+	<script type="module" src="/src/main.js"></script>
+  </body>
+</html>

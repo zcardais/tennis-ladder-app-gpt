@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin - Matches</title>
+  <style>
+  	body {
+		  background: linear-gradient(to right, #667eea, #764ba2);
+	  }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+  <div class="max-w-4xl mx-auto px-4 py-6">
+	<!-- Header -->
+	<div class="mb-6">
+	  <h1 class="text-2xl font-bold text-white">Match History</h1>
+	  <p class="text-sm text-gray-200">All reported matches across ladders</p>
+	</div>
+
+	<!-- Match List -->
+	<div id="match-list" class="space-y-4">
+	  <!-- JS will inject match cards here -->
+	</div>
+  </div>
+
+  <script>
+	const players = JSON.parse(localStorage.getItem('players') || '[]');
+	const matches = JSON.parse(localStorage.getItem('matches') || '[]');
+
+	const playerMap = {};
+	players.forEach(p => playerMap[p.id] = p.name);
+
+	const container = document.getElementById('match-list');
+
+	if (matches.length === 0) {
+	  container.innerHTML = `<div class="text-gray-500 text-sm">No matches reported yet.</div>`;
+	} else {
+	  matches
+		.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+		.forEach(match => {
+		  const p1 = playerMap[match.player1] || match.player1;
+		  const p2 = playerMap[match.player2] || match.player2;
+		  const winner = playerMap[match.winner] || match.winner;
+		  const date = new Date(match.createdAt).toLocaleDateString();
+
+		  const card = document.createElement('div');
+		  card.className = 'bg-white rounded-lg shadow-md p-4 flex justify-between items-start';
+
+		  card.innerHTML = `
+			<div>
+			  <div class="text-gray-500 text-sm mb-1">${date}</div>
+			  <div class="text-base font-semibold">${p1} vs ${p2}</div>
+			  <div class="text-sm text-gray-600">Score: <span class="font-medium">${match.score}</span></div>
+			  <div class="text-sm text-green-600 font-medium">Winner: ${winner}</div>
+			</div>
+			<div class="flex flex-col space-y-2">
+			  <button class="text-xs text-blue-600 hover:underline">Edit</button>
+			  <button class="text-xs text-red-500 hover:underline">Delete</button>
+			</div>
+		  `;
+
+		  container.appendChild(card);
+		});
+	}
+  </script>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
