@@ -3,108 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ladder</title>
+  <title>Ladder Details</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-indigo-500 to-purple-600 min-h-screen text-gray-900">
-  <div class="max-w-md mx-auto min-h-screen flex flex-col relative">
+<body class="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 text-gray-800">
 
-	<!-- Header -->
-	<div class="px-6 pt-6 pb-4 flex justify-between items-center text-white">
-	  <h1 id="ladder-title" class="text-xl font-bold">Ladder Title</h1>
-	  <button id="join-button" class="bg-white/10 backdrop-blur px-3 py-1 rounded-lg text-sm font-medium border border-white/20 text-white">Join</button>
-	</div>
+  <div class="max-w-md mx-auto p-4">
+	<!-- Page Heading -->
+	<h1 id="ladder-name" class="text-3xl font-bold text-white text-center mb-6">Loading Ladder...</h1>
 
-	<!-- Ladder Info -->
-	<div class="px-6 pb-4">
-	  <div class="bg-white rounded-2xl shadow p-4 text-sm">
-		<p><span class="font-semibold">Start:</span> <span id="start-date">TBD</span></p>
-		<p><span class="font-semibold">End:</span> <span id="end-date">TBD</span></p>
-		<p><span class="font-semibold">Type:</span> <span id="ladder-type">Singles</span></p>
+	<!-- Ladder Info Card -->
+	<div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+	  <p class="text-lg"><span class="font-semibold">Start:</span> <span id="start-date" class="text-gray-700">Loading...</span></p>
+	  <p class="text-lg"><span class="font-semibold">End:</span> <span id="end-date" class="text-gray-700">Loading...</span></p>
+	  <p class="text-lg"><span class="font-semibold">Type:</span> <span id="ladder-type" class="text-gray-700">Loading...</span></p>
+
+	  <div class="mt-4">
+		<button id="join-button" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+		  Loading...
+		</button>
 	  </div>
 	</div>
 
-	<!-- Rankings -->
-	<div class="px-6 pb-24 flex-1">
-	  <h2 class="text-sm font-semibold text-white mb-2">Rankings</h2>
-	  <ul id="rankings-list" class="space-y-2"></ul>
-	</div>
-
-	<!-- Bottom Navigation -->
-	<div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3">
-	  <div class="flex justify-around">
-		<button class="flex flex-col items-center space-y-1 text-gray-400">
-		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-		  </svg>
-		  <span class="text-xs">Home</span>
-		</button>
-		<button class="flex flex-col items-center space-y-1 text-blue-600">
-		  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-			<path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-		  </svg>
-		  <span class="text-xs font-medium">Ladders</span>
-		</button>
-		<button class="flex flex-col items-center space-y-1 text-gray-400">
-		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-		  </svg>
-		  <span class="text-xs">Challenges</span>
-		</button>
-		<button class="flex flex-col items-center space-y-1 text-gray-400">
-		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-		  </svg>
-		  <span class="text-xs">Stats</span>
-		</button>
-		<button class="flex flex-col items-center space-y-1 text-gray-400">
-		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-		  </svg>
-		  <span class="text-xs">Profile</span>
-		</button>
+	<!-- Rankings Section -->
+	<div>
+	  <h2 class="text-xl font-bold text-white mb-3">Rankings</h2>
+	  <div id="rankings-list" class="bg-white rounded-xl shadow-lg p-4">
+		<p class="text-gray-500">No rankings to display yet.</p>
 	  </div>
 	</div>
   </div>
 
-  <!-- Ladder Script -->
-  <script>
-	// Example scaffold for future backend hookup
-	const urlParams = new URLSearchParams(window.location.search);
-	const ladderId = urlParams.get('ladderId');
+  <!-- Bottom Navigation -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300">
+	<div class="flex justify-around py-3">
+	  <a href="dashboard.html" class="flex flex-col items-center text-gray-400">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+			d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+		</svg>
+		<span class="text-xs">Home</span>
+	  </a>
+	  <a href="ladder.html" class="flex flex-col items-center text-blue-600">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+			d="M3 10h18M3 6h18M3 14h18M3 18h18"/>
+		</svg>
+		<span class="text-xs font-medium">Ladders</span>
+	  </a>
+	  <a href="challenges.html" class="flex flex-col items-center text-gray-400">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+			d="M17 8h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V10a2 2 0 012-2h2M12 15v2m0-6v2m0-6v2m0-6v2"/>
+		</svg>
+		<span class="text-xs">Challenges</span>
+	  </a>
+	  <a href="stats.html" class="flex flex-col items-center text-gray-400">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+			d="M11 3h2v18h-2V3zm4 6h2v12h-2V9zm-8 6h2v6H7v-6z"/>
+		</svg>
+		<span class="text-xs">Stats</span>
+	  </a>
+	  <a href="profile.html" class="flex flex-col items-center text-gray-400">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+			d="M5.121 17.804A9 9 0 1118.879 6.196 9 9 0 015.121 17.804z"/>
+		</svg>
+		<span class="text-xs">Profile</span>
+	  </a>
+	</div>
+  </div>
 
-	const ladders = JSON.parse(localStorage.getItem('ladders') || '[]');
-	const ladder = ladders.find(l => l.id === ladderId);
-
-	const title = document.getElementById('ladder-title');
-	const start = document.getElementById('start-date');
-	const end = document.getElementById('end-date');
-	const type = document.getElementById('ladder-type');
-	const list = document.getElementById('rankings-list');
-	const joinBtn = document.getElementById('join-button');
-
-	if (ladder) {
-	  title.textContent = ladder.name;
-	  start.textContent = ladder.startDate;
-	  end.textContent = ladder.endDate;
-	  type.textContent = ladder.type || 'Singles';
-
-	  const rankings = ladder.rankings || [];
-	  rankings.forEach((player, i) => {
-		const li = document.createElement('li');
-		li.className = "bg-white p-3 rounded-lg shadow text-sm flex justify-between items-center";
-		li.innerHTML = `<span>#${i + 1}</span><span>${player.name}</span>`;
-		list.appendChild(li);
-	  });
-
-	  const currentUser = 'tyler';
-	  if (ladder.participants?.includes(currentUser)) {
-		joinBtn.textContent = 'Leave';
-		joinBtn.classList.add('bg-red-500');
-		joinBtn.classList.remove('bg-white/10');
-	  }
-	}
-  </script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

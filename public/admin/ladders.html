@@ -15,12 +15,15 @@
 	<div class="max-w-3xl mx-auto px-4 py-8">
 	  <header class="mb-8">
 		<h1 class="text-3xl font-bold text-white">Manage Ladders</h1>
+		<div id="admin-ladders-list" class="space-y-4 mt-4"></div>
 		<p class="text-white/80">View, activate, or archive ladders below.</p>
 	  </header>
 
 	  <div class="bg-white rounded-lg shadow-lg overflow-hidden">
 		<div id="ladder-list" class="divide-y divide-gray-100">
-		  <!-- JS will inject ladders here -->
+		  <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+			<div id="ladders-list" class="space-y-4 mt-4"></div>
+		  </div>
 		</div>
 	  </div>
 
@@ -28,65 +31,46 @@
 		<a href="new-ladder.html" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold shadow hover:bg-blue-700 transition">+ Create New Ladder</a>
 	  </div>
 	</div>
-
-	<script>
-	  const ladderListEl = document.getElementById('ladder-list');
-	  const ladders = JSON.parse(localStorage.getItem('ladders') || '[]');
-	  const activeId = localStorage.getItem('activeLadderId');
-
-	  function renderLadders() {
-		ladderListEl.innerHTML = '';
-
-		if (ladders.length === 0) {
-		  ladderListEl.innerHTML = '<p class="p-6 text-gray-600">No ladders found.</p>';
-		  return;
-		}
-
-		ladders.forEach((ladder, index) => {
-		  const isActive = ladder.id === activeId;
-		  const div = document.createElement('div');
-		  div.className = 'px-6 py-4';
-
-		  div.innerHTML = `
-			<div class="flex justify-between items-start">
-			  <div>
-				<h2 class="text-lg font-semibold">${ladder.name}</h2>
-				<p class="text-sm text-gray-600">${ladder.startDate} → ${ladder.endDate}</p>
-				<p class="text-sm ${isActive ? 'text-green-600' : 'text-gray-500'} mt-1">
-				  ${isActive ? 'Active Ladder' : 'Inactive'}
-				</p>
-			  </div>
-			  <div class="space-y-1 text-right">
-				<button onclick="setActive('${ladder.id}')" class="text-sm text-blue-600 hover:underline">Set Active</button><br/>
-				<button onclick="editLadder('${ladder.id}')" class="text-sm text-purple-600 hover:underline">Edit</button><br/>
-				<button onclick="archiveLadder(${index})" class="text-sm text-red-600 hover:underline">Archive</button>
-			  </div>
-			</div>
-		  `;
-
-		  ladderListEl.appendChild(div);
-		});
-	  }
-
-	  function setActive(id) {
-		localStorage.setItem('activeLadderId', id);
-		renderLadders();
-	  }
-
-	  function editLadder(id) {
-		window.location.href = `new-ladder.html?id=${id}`;
-	  }
-
-	  function archiveLadder(index) {
-		if (confirm('Are you sure you want to archive this ladder?')) {
-		  ladders.splice(index, 1);
-		  localStorage.setItem('ladders', JSON.stringify(ladders));
-		  renderLadders();
-		}
-	  }
-
-	  renderLadders();
-	</script>
+	<!-- Bottom Navigation -->
+	<div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 z-50">
+	  <div class="flex justify-around">
+		<a href="index.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
+		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+			  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+		  </svg>
+		  <span class="text-xs">Dashboard</span>
+		</a>
+		<a href="ladders.html" class="flex flex-col items-center space-y-1 text-blue-600">
+		  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+			<path
+			  d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+		  </svg>
+		  <span class="text-xs font-medium">Ladders</span>
+		</a>
+		<a href="matches.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
+		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+			  d="M9 17v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v8m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+		  </svg>
+		  <span class="text-xs">Matches</span>
+		</a>
+		<a href="players.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
+		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+			  d="M5.121 17.804A9.978 9.978 0 0112 15c2.21 0 4.243.715 5.879 1.922M15 10a3 3 0 11-6 0 3 3 0 016 0z"/>
+		  </svg>
+		  <span class="text-xs">Players</span>
+		</a>
+		<a href="settings.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
+		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+			  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+		  </svg>
+		  <span class="text-xs">Settings</span>
+		</a>
+	  </div>
+	</div>
 	<script type="module" src="/src/main.js"></script>
   </body>
 </html>
