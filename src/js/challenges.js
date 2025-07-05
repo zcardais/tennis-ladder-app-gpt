@@ -1,89 +1,103 @@
-import { db } from './firebase-setup.js';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "./firebase-setup.js";
 
-console.log("Challenges.js loaded");
+const loggedInPlayerId = "tyler"; // TEMP: replace with Firebase Auth user later
 
-const loggedInPlayerId = 'tyler'; // Replace with dynamic user ID later
-
-// Elements for tabs
-const pendingTab = document.getElementById('pending-list');
-const sentTab = document.getElementById('sent-list');
-const historyTab = document.getElementById('history-list');
-
-// Fetch all challenges for the user
 export async function init() {
+  console.log("Challenges page loaded");
+
+  const pendingList = document.getElementById("pending-list");
+  const sentList = document.getElementById("sent-list");
+  const historyList = document.getElementById("history-list");
+
   try {
-    const q = query(
-      collection(db, 'challenges'),
-      where('participants', 'array-contains', loggedInPlayerId) // Assuming you store participants: [challenger, opponent]
-    );
-    const querySnapshot = await getDocs(q);
-
-    const pending = [];
-    const sent = [];
-    const history = [];
-
+    const querySnapshot = await getDocs(collection(db, "challenges"));
+    const challenges = [];
     querySnapshot.forEach((doc) => {
-      const challenge = doc.data();
-      challenge.id = doc.id;
-
-      if (challenge.status === 'pending') {
-        if (challenge.opponent === loggedInPlayerId) {
-          pending.push(challenge);
-        } else if (challenge.challenger === loggedInPlayerId) {
-          sent.push(challenge);
-        }
-      } else if (challenge.status === 'completed') {
-        history.push(challenge);
-      }
+      challenges.push({ id: doc.id, ...doc.data() });
     });
 
-    renderTab(pendingTab, pending, 'pending');
-    renderTab(sentTab, sent, 'sent');
-    renderTab(historyTab, history, 'history');
+    console.log("Fetched challenges:", challenges);
 
+    // Clear existing lists
+    pendingList.innerHTML = "";
+    sentList.innerHTML = "";
+    historyList.innerHTML = "";
+
+    challenges.forEach((challenge) => {
+      const isChallenger = challenge.challenger === loggedInPlayerId;
+      const isOpponent = challenge.opponent === loggedInPlayerId;
+
+      // Create DOM element for challenge
+      const challengeDiv = document.createElement("div");
+      challengeDiv.className = "p-3 border rounded-lg mb-2 bg-white text-gray-800 shadow";
+
+      let content = `
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="font-medium">${challenge.challenger} vs ${challenge.opponent}</p>
+            <p class="text-sm text-gray-500">Status: ${challenge.status}</p>
+          </div>
+      `;
+
+      // Show Accept/Deny buttons if it's pending and issued TO loggedInPlayerId
+      if (challenge.status === "pending" && isOpponent) {
+        content += `
+          <div class="flex space-x-2">
+            <button class="accept-btn px-3 py-1 bg-green-500 text-white rounded">Accept</button>
+            <button class="deny-btn px-3 py-1 bg-red-500 text-white rounded">Deny</button>
+          </div>
+        `;
+      }
+
+      content += `</div>`;
+      challengeDiv.innerHTML = content;
+
+      // Append to appropriate tab
+      if (challenge.status === "pending") {
+        pendingList.appendChild(challengeDiv);
+      } else if (isChallenger && challenge.status === "active") {
+        sentList.appendChild(challengeDiv);
+      } else {
+        historyList.appendChild(challengeDiv);
+      }
+
+      // Add event listeners for Accept/Deny
+      const acceptBtn = challengeDiv.querySelector(".accept-btn");
+      const denyBtn = challengeDiv.querySelector(".deny-btn");
+
+      if (acceptBtn) {
+        acceptBtn.addEventListener("click", async () => {
+          await updateChallengeStatus(challenge.id, "active");
+          challengeDiv.querySelector(".text-gray-500").textContent = "Status: active";
+          acceptBtn.remove();
+          denyBtn.remove();
+        });
+      }
+
+      if (denyBtn) {
+        denyBtn.addEventListener("click", async () => {
+          await updateChallengeStatus(challenge.id, "denied");
+          challengeDiv.querySelector(".text-gray-500").textContent = "Status: denied";
+          acceptBtn.remove();
+          denyBtn.remove();
+        });
+      }
+    });
   } catch (error) {
-    console.error('Error fetching challenges:', error);
+    console.error("Error loading challenges:", error);
   }
 }
 
-function renderTab(container, challenges, type) {
-  container.innerHTML = ''; // Clear previous
-
-  if (challenges.length === 0) {
-    container.innerHTML = `<p class="text-blue-200 text-center">No ${type} challenges</p>`;
-    return;
+async function updateChallengeStatus(challengeId, newStatus) {
+  try {
+    const challengeRef = doc(db, "challenges", challengeId);
+    await updateDoc(challengeRef, {
+      status: newStatus,
+      updatedAt: serverTimestamp(),
+    });
+    console.log(`Challenge ${challengeId} updated to ${newStatus}`);
+  } catch (err) {
+    console.error(`Error updating challenge ${challengeId}:`, err);
   }
-
-  challenges.forEach(challenge => {
-    const item = document.createElement('div');
-    item.className = 'bg-white text-black rounded-lg p-3 shadow';
-
-    let content = `
-      <div class="flex justify-between items-center">
-        <div>
-          <p class="font-semibold">${challenge.challenger} vs ${challenge.opponent}</p>
-          <p class="text-sm text-gray-600">${challenge.dateIssued}</p>
-        </div>
-    `;
-
-    if (type === 'pending' && challenge.opponent === loggedInPlayerId) {
-      content += `
-        <div class="flex space-x-2">
-          <button class="accept-btn bg-green-500 text-white px-2 py-1 rounded" data-id="${challenge.id}">Accept</button>
-          <button class="deny-btn bg-red-500 text-white px-2 py-1 rounded" data-id="${challenge.id}">Deny</button>
-        </div>
-      `;
-    } else if (type === 'history') {
-      content += `
-        <div class="text-right">
-          <p class="text-sm">${challenge.result}</p>
-        </div>
-      `;
-    }
-
-    content += '</div>';
-    item.innerHTML = content;
-    container.appendChild(item);
-  });
 }
