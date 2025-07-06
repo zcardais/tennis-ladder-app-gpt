@@ -14,9 +14,10 @@ function loadPageScripts() {
 	import('./js/stats.js').then(module => module.init());
   } else if (page.endsWith('report.html')) {
 	import('./js/report.js').then(module => module.init());
-  } else if (page.endsWith('ladder.html')) {
-	import('./js/ladder.js').then(module => module.init());
-  } else if (page.includes('/admin/')) {
+  }
+
+  // 🔽 Move admin check above ladder.html
+  else if (page.includes('/admin/')) {
 	if (page.endsWith('index.html')) {
 	  import('./js/admin-index.js').then(module => module.init());
 	} else if (page.endsWith('ladders.html')) {
@@ -32,6 +33,11 @@ function loadPageScripts() {
 	} else if (page.endsWith('settings.html')) {
 	  import('./js/admin-settings.js').then(module => module.init());
 	}
+  }
+
+  // 🔽 Ladder.html must come after admin check
+  else if (page.endsWith('ladder.html')) {
+	import('./js/ladder.js').then(module => module.init());
   }
 }
 
