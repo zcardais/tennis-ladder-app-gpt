@@ -33,6 +33,7 @@ export async function init() {
         <div class="flex space-x-2">
           <button class="edit-btn bg-blue-600 text-white px-3 py-1 rounded">Edit</button>
           <button class="delete-btn bg-red-600 text-white px-3 py-1 rounded">Delete</button>
+          <a href="players.html?ladderId=${ladderId}" class="bg-indigo-600 text-white px-3 py-1 rounded">Manage Players</a>
         </div>
       `;
 

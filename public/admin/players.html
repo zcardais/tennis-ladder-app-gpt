@@ -10,39 +10,26 @@
   <div class="max-w-md mx-auto py-6 px-4">
 	<a href="ladders.html" class="text-white underline">&larr; Back to Ladders</a>
 
-	<h1 class="text-3xl font-bold mt-4 mb-6">Manage Players</h1>
+	<h1 class="text-3xl font-bold mt-4 mb-2">Manage Players</h1>
+	<h2 id="ladder-name" class="text-lg font-semibold mb-4 text-indigo-200"></h2>
+	<div id="status-message" class="text-green-200 bg-green-700 rounded p-2 mb-4 text-sm font-medium"></div>
 
 	<!-- Player List -->
 	<div class="bg-white text-gray-800 rounded-xl shadow-lg p-4 space-y-4">
-	  <div class="flex justify-between items-center border-b pb-2">
-		<span class="font-semibold">Rank</span>
-		<span class="font-semibold">Name</span>
-		<span class="font-semibold">Record</span>
+	  <div class="flex justify-between items-center border-b pb-2 font-semibold">
+		<span>Player</span>
+		<span>Actions</span>
 	  </div>
-
-	  <!-- Example Players (Static for now) -->
-	  <div class="flex justify-between items-center border-b pb-2">
-		<span>#1</span>
-		<span>Alex Johnson</span>
-		<span>5–2</span>
-	  </div>
-	  <div class="flex justify-between items-center border-b pb-2">
-		<span>#2</span>
-		<span>Jordan Smith</span>
-		<span>4–3</span>
-	  </div>
-	  <div class="flex justify-between items-center">
-		<span>#3</span>
-		<span>Taylor Lee</span>
-		<span>3–4</span>
-	  </div>
+	  <ul id="participants-list" class="space-y-2"></ul>
 	</div>
 
 	<!-- Add Player -->
 	<div class="mt-6 bg-white text-gray-800 rounded-xl shadow p-4">
 	  <h2 class="text-lg font-bold mb-3">Add New Player</h2>
 	  <form id="add-player-form" class="space-y-3">
-		<input type="text" id="new-player-name" placeholder="Full Name" class="w-full p-2 border rounded" required />
+		<input type="email" id="add-player-input" placeholder="Email" class="w-full p-2 border rounded" required />
+		<input type="text" id="add-player-firstname" placeholder="First Name" class="w-full p-2 border rounded" />
+		<input type="text" id="add-player-lastname" placeholder="Last Name" class="w-full p-2 border rounded" />
 		<button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold">Add Player</button>
 	  </form>
 	</div>
@@ -88,14 +75,7 @@
 	</div>
   </div>
 
-  <script>
-	document.getElementById('add-player-form').addEventListener('submit', function(e) {
-	  e.preventDefault();
-	  const name = document.getElementById('new-player-name').value;
-	  alert('Player "' + name + '" added (demo only)');
-	  this.reset();
-	});
-  </script>
+  <script type="module" src="/src/js/admin-manage-players.js"></script>
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>
