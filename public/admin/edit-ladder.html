@@ -16,21 +16,21 @@
   <div class="max-w-md mx-auto py-6 px-4">
 	<h1 class="text-white text-2xl font-bold mb-6 text-center">Edit Ladder</h1>
 
-	<form class="bg-white rounded-xl shadow-md p-6 space-y-5">
+	<form id="edit-ladder-form" class="bg-white rounded-xl shadow-md p-6 space-y-5">
 
 	  <label class="block">
 		<span class="text-sm text-gray-600">Ladder Name</span>
-		<input type="text" class="mt-1 block w-full border rounded p-2" placeholder="2025 FC Ladder" />
+		<input id="ladder-name" type="text" class="mt-1 block w-full border rounded p-2" placeholder="2025 FC Ladder" />
 	  </label>
 
 	  <label class="block">
 		<span class="text-sm text-gray-600">Description</span>
-		<input type="text" class="mt-1 block w-full border rounded p-2" placeholder="Summer Open Challenge" />
+		<input id="description" type="text" class="mt-1 block w-full border rounded p-2" placeholder="Summer Open Challenge" />
 	  </label>
 
 	  <label class="block">
 		<span class="text-sm text-gray-600">Ranking Formula</span>
-		<select class="mt-1 block w-full border rounded p-2">
+		<select id="ranking-system" class="mt-1 block w-full border rounded p-2">
 		  <option value="bump">Bump</option>
 		  <option value="swap">Swap</option>
 		  <option value="points">Points-Based</option>
@@ -39,33 +39,33 @@
 
 	  <label class="block">
 		<span class="text-sm text-gray-600">Max Participants</span>
-		<input type="number" class="mt-1 block w-full border rounded p-2" placeholder="e.g. 50" />
+		<input id="max-players" type="number" class="mt-1 block w-full border rounded p-2" placeholder="e.g. 50" />
 	  </label>
 
 	  <div class="flex space-x-4">
 		<label class="block flex-1">
 		  <span class="text-sm text-gray-600">Start Date</span>
-		  <input type="date" class="mt-1 block w-full border rounded p-2" />
+		  <input id="start-date" type="date" class="mt-1 block w-full border rounded p-2" value="" />
 		</label>
 
 		<label class="block flex-1">
 		  <span class="text-sm text-gray-600">End Date</span>
-		  <input type="date" class="mt-1 block w-full border rounded p-2" />
+		  <input id="end-date" type="date" class="mt-1 block w-full border rounded p-2" value="" />
 		</label>
 	  </div>
 
 	  <label class="block">
 		<span class="text-sm text-gray-600">Admin Name(s)</span>
-		<input type="text" class="mt-1 block w-full border rounded p-2" placeholder="Zach Cardais" />
+		<input id="admin-names" type="text" class="mt-1 block w-full border rounded p-2" placeholder="Zach Cardais" />
 	  </label>
 
 	  <label class="block">
 		<span class="text-sm text-gray-600">Admin Email(s)</span>
-		<input type="email" class="mt-1 block w-full border rounded p-2" placeholder="zcardais@gmail.com" />
+		<input id="admin-emails" type="email" class="mt-1 block w-full border rounded p-2" placeholder="zcardais@gmail.com" />
 	  </label>
 
 	  <label class="flex items-center space-x-3">
-		<input type="checkbox" class="form-checkbox" />
+		<input id="allow-joining" type="checkbox" class="form-checkbox" />
 		<span>Allow players to join from their dashboard</span>
 	  </label>
 
@@ -116,6 +116,72 @@
 	  </a>
 	</div>
   </div>
+  <script type="module">
+    import { db } from "/src/js/firebase-setup.js";
+    import { doc, getDoc, updateDoc } from "firebase/firestore";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const ladderId = urlParams.get("id");
+
+    async function populateForm() {
+      if (!ladderId) {
+        alert("No ladder ID found in URL.");
+        return;
+      }
+
+      try {
+        const ladderRef = doc(db, "ladders", ladderId);
+        const ladderSnap = await getDoc(ladderRef);
+
+        if (!ladderSnap.exists()) {
+          alert("Ladder not found.");
+          return;
+        }
+
+        const data = ladderSnap.data();
+        document.getElementById("ladder-name").value = data.name || "";
+        document.getElementById("description").value = data.description || "";
+        document.getElementById("ranking-system").value = data.rankingSystem || "bump";
+        document.getElementById("max-players").value = data.maxPlayers || "";
+        document.getElementById("start-date").value = data.startDate || "";
+        document.getElementById("end-date").value = data.endDate || "";
+        document.getElementById("admin-names").value = data.adminNames || "";
+        document.getElementById("admin-emails").value = data.adminEmails || "";
+        document.getElementById("allow-joining").checked = !!data.allowJoining;
+      } catch (error) {
+        console.error("Error fetching ladder data:", error);
+        alert("Failed to load ladder. See console for details.");
+      }
+    }
+
+    document.getElementById("edit-ladder-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const updatedData = {
+        name: document.getElementById("ladder-name").value.trim(),
+        description: document.getElementById("description").value.trim(),
+        rankingSystem: document.getElementById("ranking-system").value,
+        maxPlayers: parseInt(document.getElementById("max-players").value, 10),
+        startDate: document.getElementById("start-date").value,
+        endDate: document.getElementById("end-date").value,
+        adminNames: document.getElementById("admin-names").value.trim(),
+        adminEmails: document.getElementById("admin-emails").value.trim(),
+        allowJoining: document.getElementById("allow-joining").checked
+      };
+
+      try {
+        const ladderRef = doc(db, "ladders", ladderId);
+        await updateDoc(ladderRef, updatedData);
+        alert("Ladder updated successfully!");
+        window.location.href = "ladders.html";
+      } catch (err) {
+        console.error("Failed to update ladder:", err);
+        alert("Error updating ladder. See console for details.");
+      }
+    });
+
+    populateForm();
+  </script>
   <script type="module" src="/src/main.js"></script>
 
 </body>
