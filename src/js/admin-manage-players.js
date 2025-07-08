@@ -22,6 +22,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const statusMessage = document.getElementById("status-message");
   const ladderNameDisplay = document.getElementById("ladder-name");
 
+  const firstNameInput = document.getElementById("add-player-firstname");
+  const lastNameInput = document.getElementById("add-player-lastname");
+  const nameRegex = /^[A-Za-z\s\-]+$/;
+
+  // Status message helpers
+  function clearStatus() {
+    if (!statusMessage) return;
+    statusMessage.textContent = "";
+    statusMessage.classList.add("hidden");
+    statusMessage.classList.remove("bg-red-700", "text-red-200", "bg-green-700", "text-green-200");
+  }
+  function showError(message) {
+    if (!statusMessage) return;
+    statusMessage.textContent = `⚠️ ${message}`;
+    statusMessage.classList.remove("hidden", "bg-green-700", "text-green-200");
+    statusMessage.classList.add("bg-red-700", "text-red-200");
+  }
+  function showSuccess(message) {
+    if (!statusMessage) return;
+    statusMessage.textContent = `✅ ${message}`;
+    statusMessage.classList.remove("hidden", "bg-red-700", "text-red-200");
+    statusMessage.classList.add("bg-green-700", "text-green-200");
+  }
+
   if (!statusMessage) {
     console.warn("⚠️ statusMessage element not found in DOM.");
   }
@@ -195,20 +219,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   addForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    clearStatus();
+
+    const email = addInput.value.trim().toLowerCase();
+    const firstName = document.getElementById("add-player-firstname")?.value.trim() || "";
+    const lastName = document.getElementById("add-player-lastname")?.value.trim() || "";
+
+    if (!addInput.checkValidity()) {
+      showError(addInput.title || "Please enter a valid email address.");
+      return;
+    }
+    if (!firstName && !lastName) {
+      showError("Please enter at least a first or last name.");
+      return;
+    }
+    if (firstName && !firstNameInput.checkValidity()) {
+      showError(firstNameInput.title);
+      return;
+    }
+    if (lastName && !lastNameInput.checkValidity()) {
+      showError(lastNameInput.title);
+      return;
+    }
+    if (firstName && !nameRegex.test(firstName)) {
+      showError("First name can only contain letters, spaces, and hyphens.");
+      return;
+    }
+    if (lastName && !nameRegex.test(lastName)) {
+      showError("Last name can only contain letters, spaces, and hyphens.");
+      return;
+    }
+
     const addButton = addForm.querySelector("button[type='submit']");
     addButton.disabled = true;
     addButton.textContent = "Adding...";
 
     try {
-      const email = addInput.value.trim().toLowerCase();
-      const firstName = document.getElementById("add-player-firstname")?.value.trim() || "";
-      const lastName = document.getElementById("add-player-lastname")?.value.trim() || "";
-
-      if (!email || !email.includes("@")) {
-        alert("Please enter a valid email address.");
-        return;
-      }
-
       // Look for existing player by email
       const playersRef = collection(db, "players");
       const q = query(playersRef, where("email", "==", email));
@@ -231,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (currentParticipants.includes(userId)) {
-        alert("That player is already in the ladder.");
+        showError("That player is already in the ladder.");
         return;
       }
 
@@ -239,10 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
         participants: arrayUnion(userId),
       });
 
-      if (statusMessage) {
-        statusMessage.textContent = "✅ Player added successfully.";
-        statusMessage.classList.remove("hidden");
-      }
+      showSuccess("Player added successfully.");
       console.log("Added userId to participants:", userId);
 
       addInput.value = "";
@@ -252,12 +295,9 @@ document.addEventListener("DOMContentLoaded", () => {
     } finally {
       addButton.disabled = false;
       addButton.textContent = "Add Player";
-      if (statusMessage) {
-        setTimeout(() => {
-          statusMessage.textContent = "";
-          statusMessage.classList.add("hidden");
-        }, 3000);
-      }
+      setTimeout(() => {
+        clearStatus();
+      }, 3000);
     }
   });
 
