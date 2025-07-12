@@ -1,5 +1,5 @@
 import { collection, getDocs, deleteDoc, doc, writeBatch, updateDoc, query, where } from "firebase/firestore";
-import { db } from "./firebase-setup.js";
+import { db } from "../firebase-setup.js";
 
 export async function init() {
   console.log("Admin Ladders page loaded");

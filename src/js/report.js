@@ -1,14 +1,38 @@
 import { doc, getDoc, updateDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
-import { db } from "./firebase-setup.js";
+import { db } from "../firebase-setup.js";
+
+// Toast helper for non-blocking messages
+function showToast(message, duration = 3000) {
+  const container = document.getElementById("toast-container");
+  if (!container) return;
+  container.classList.remove("hidden");
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = message;
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add("show"));
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => {
+      container.removeChild(toast);
+      if (!container.children.length) container.classList.add("hidden");
+    }, 300);
+  }, duration);
+}
 
 console.log("Report.js loaded");
 
 const urlParams = new URLSearchParams(window.location.search);
-const challengeId = urlParams.get("challengeId");
+const challengeId = urlParams.get("challengeId") || urlParams.get("id");
+
+// Ensure match details load even if init() is never called
+loadMatchDetails();
 
 const matchSummary = document.getElementById("match-summary");
 const reportForm = document.getElementById("report-form");
 const confirmation = document.getElementById("confirmation");
+
+const submitBtn = reportForm.querySelector("button[type='submit']");
 
 async function loadMatchDetails() {
   if (!challengeId) {
@@ -30,28 +54,39 @@ async function loadMatchDetails() {
   const data = challengeSnap.data();
   console.log("Fetched challenge data:", data);
 
-  matchSummary.innerHTML = `
-    <p class="text-lg font-bold">${data.challenger} vs. ${data.opponent}</p>
-    <p class="text-gray-600">Date Issued: ${data.dateIssued}</p>
+  const summaryEl = document.getElementById("match-summary");
+  const { challenger, opponent, dateIssued } = data;
+  const dateObj = dateIssued.toDate();
+const dateStr = dateObj.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+  summaryEl.innerHTML = `
+    <p class="font-semibold text-lg">${challenger} vs. ${opponent}</p>
+    <p class="text-sm text-white/70 mt-1">Date Issued: ${dateStr}</p>
   `;
 }
 
 reportForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting...";
+
   const sets = [
-    [
-      parseInt(document.getElementById("set1-you").value || 0),
-      parseInt(document.getElementById("set1-them").value || 0)
-    ],
-    [
-      parseInt(document.getElementById("set2-you").value || 0),
-      parseInt(document.getElementById("set2-them").value || 0)
-    ],
-    [
-      parseInt(document.getElementById("set3-you").value || 0),
-      parseInt(document.getElementById("set3-them").value || 0)
-    ]
+    {
+      you: parseInt(document.getElementById("set1-you").value || 0),
+      them: parseInt(document.getElementById("set1-them").value || 0)
+    },
+    {
+      you: parseInt(document.getElementById("set2-you").value || 0),
+      them: parseInt(document.getElementById("set2-them").value || 0)
+    },
+    {
+      you: parseInt(document.getElementById("set3-you").value || 0),
+      them: parseInt(document.getElementById("set3-them").value || 0)
+    }
   ];
 
   console.log("Submitting sets:", sets);
@@ -66,8 +101,8 @@ reportForm.addEventListener("submit", async (e) => {
     let player2Wins = 0;
 
     sets.forEach(set => {
-      if (set[0] > set[1]) player1Wins++;
-      else if (set[1] > set[0]) player2Wins++;
+      if (set.you > set.them) player1Wins++;
+      else if (set.them > set.you) player2Wins++;
     });
 
     const winnerId = player1Wins > player2Wins ? challengeData.challenger : challengeData.opponent;
@@ -79,6 +114,7 @@ reportForm.addEventListener("submit", async (e) => {
     await updateDoc(challengeRef, {
       status: "completed",
       score: { sets },
+      completedAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
 
@@ -98,12 +134,22 @@ reportForm.addEventListener("submit", async (e) => {
 
     confirmation.classList.remove("hidden");
     reportForm.classList.add("hidden");
+    showToast("Score submitted successfully!");
     setTimeout(() => window.location.href = "challenges.html", 2000);
 
   } catch (error) {
     console.error("🔥 Error saving score and creating match document:", error);
-    alert("Failed to save score. Try again.");
+    showToast("Failed to save score. Try again.");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Score for Confirmation";
   }
 });
 
-loadMatchDetails();
+/**
+ * init - entry point called by main.js
+ */
+export async function init() {
+  console.log("Report.js init");
+  await loadMatchDetails();
+}

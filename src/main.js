@@ -1,4 +1,4 @@
-import './js/firebase-setup.js';
+import './firebase-setup.js';
 console.log("Main.js loaded");
 
 function loadPageScripts() {

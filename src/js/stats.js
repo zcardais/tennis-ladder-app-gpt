@@ -1,5 +1,5 @@
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "./firebase-setup.js";
+import { db } from "../firebase-setup.js";
 
 console.log("Stats.js loaded");
 
@@ -63,4 +63,10 @@ async function loadPlayerStats() {
   }
 }
 
-loadPlayerStats();
+/**
+ * init - entry point called by main.js
+ */
+export async function init() {
+  console.log("Stats.js init");
+  await loadPlayerStats();
+}

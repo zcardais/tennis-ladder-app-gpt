@@ -10,7 +10,7 @@ import {
   arrayRemove,
   setDoc,
 } from "firebase/firestore";
-import { db } from "./firebase-setup.js";
+import { db } from "../firebase-setup.js";
 
 document.addEventListener("DOMContentLoaded", () => {
 

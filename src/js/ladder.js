@@ -1,5 +1,5 @@
 import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
-import { db } from "./firebase-setup.js";
+import { db } from "../firebase-setup.js";
 
 console.log("Ladders page loaded");
 

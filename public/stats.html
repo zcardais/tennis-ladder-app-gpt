@@ -6,15 +6,16 @@
   <title>Player Stats</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-indigo-400 to-purple-500 text-white min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-gradient-to-r from-blue-500 to-purple-600">
+  <div class="w-full max-w-3xl mx-auto flex-1 py-6 px-4 space-y-6">
   <!-- Header -->
   <div class="bg-white/10 backdrop-blur-sm px-6 py-4 flex items-center justify-between">
-	<h1 class="text-xl font-bold text-white">Statistics</h1>
+	<h1 class="text-white text-2xl font-bold text-center mb-6">Statistics</h1>
   </div>
 
   <!-- Player Overview -->
   <div class="px-6 py-4">
-	<div class="bg-white/15 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+	<div class="bg-white rounded-xl shadow-md p-6 space-y-4">
 	  <div class="flex items-center space-x-4">
 		<div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
 		  <span id="player-initials" class="text-white font-bold text-xl">--</span>
@@ -38,7 +39,7 @@
 
   <!-- Performance Overview -->
   <div class="flex-1 px-6 pb-6">
-	<div class="bg-white rounded-2xl shadow-lg h-full overflow-y-auto pb-24">
+	<div class="bg-white rounded-xl shadow-md h-full overflow-y-auto pb-24">
 	  <div class="p-4 border-b border-gray-100">
 		<h3 class="font-semibold text-black mb-3">Performance Overview</h3>
 		<div class="grid grid-cols-2 gap-4">
@@ -60,13 +61,14 @@
 	  <!-- Recent Matches -->
 	  <div class="p-4">
 		<h3 class="font-semibold text-black mb-3">Recent Matches</h3>
-		<div id="recent-matches" class="space-y-3">
-		  <div class="p-3 rounded-lg bg-gray-50 text-gray-500 text-sm text-center border border-dashed border-gray-300">
+		<div id="recent-matches" class="space-y-4">
+		  <div class="bg-white rounded-xl shadow-sm p-4 flex justify-between items-center">
 			No recent matches to display.
 		  </div>
 		</div>
 	  </div>
 	</div>
+  </div>
   </div>
 
   <!-- Bottom Navigation -->

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Ladder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #667eea, #764ba2);
+    }
+    /* Toast container & messages */
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+    }
+    .toast {
+      background: #333;
+      color: #fff;
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-gray-800">
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container hidden"></div>
+
+  <div class="max-w-md mx-auto py-6 px-4">
+    <h1 class="text-white text-2xl font-bold mb-6 text-center">Edit Ladder</h1>
+
+    <form id="edit-ladder-form" class="bg-white rounded-xl shadow-md p-6 space-y-5">
+
+      <label class="block">
+        <span class="text-sm text-gray-600">Ladder Name</span>
+        <input id="ladder-name" type="text" class="mt-1 block w-full border rounded p-2" placeholder="2025 FC Ladder" />
+      </label>
+
+      <label class="block">
+        <span class="text-sm text-gray-600">Description</span>
+        <input id="description" type="text" class="mt-1 block w-full border rounded p-2" placeholder="Summer Open Challenge" />
+      </label>
+
+      <label class="block">
+        <span class="text-sm text-gray-600">Ranking Formula</span>
+        <select id="ranking-system" class="mt-1 block w-full border rounded p-2">
+          <option value="bump">Bump</option>
+          <option value="swap">Swap</option>
+          <option value="points">Points-Based</option>
+        </select>
+      </label>
+
+      <label class="block">
+        <span class="text-sm text-gray-600">Max Participants</span>
+        <input id="max-players" type="number" class="mt-1 block w-full border rounded p-2" placeholder="e.g. 50" />
+      </label>
+
+      <div class="flex space-x-4">
+        <label class="block flex-1">
+          <span class="text-sm text-gray-600">Start Date</span>
+          <input id="start-date" type="date" class="mt-1 block w-full border rounded p-2" />
+        </label>
+
+        <label class="block flex-1">
+          <span class="text-sm text-gray-600">End Date</span>
+          <input id="end-date" type="date" class="mt-1 block w-full border rounded p-2" />
+        </label>
+      </div>
+
+      <label class="block">
+        <span class="text-sm text-gray-600">Admin Name(s)</span>
+        <input id="admin-names" type="text" class="mt-1 block w-full border rounded p-2" placeholder="Zach Cardais" />
+      </label>
+
+      <label class="block">
+        <span class="text-sm text-gray-600">Admin Email(s)</span>
+        <input id="admin-emails" type="text" class="mt-1 block w-full border rounded p-2" placeholder="email1@example.com, email2@example.com" />
+      </label>
+
+      <label class="block">
+        <span class="text-sm text-gray-600">Sport</span>
+        <select id="sport" class="mt-1 block w-full border rounded p-2">
+          <option value="tennis">Tennis</option>
+          <option value="pickleball">Pickleball</option>
+          <option value="padel">Padel</option>
+        </select>
+      </label>
+
+      <label class="block">
+        <span class="text-sm text-gray-600">Type</span>
+        <select id="ladder-type" class="mt-1 block w-full border rounded p-2">
+          <option value="singles">Singles</option>
+          <option value="doubles">Doubles</option>
+        </select>
+      </label>
+
+      <label class="flex items-center space-x-3">
+        <input id="allow-joining" type="checkbox" class="form-checkbox" />
+        <span>Allow players to join from their dashboard</span>
+      </label>
+
+      <div class="pt-6">
+        <button id="save-button" type="submit" class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
+        <div id="saving-spinner" class="hidden inline-block ml-4">Saving…</div>
+      </div>
+
+    </form>
+  </div>
+
+  <script type="module" src="/src/js/admin-edit-ladder.js"></script>
+</body>
+</html>

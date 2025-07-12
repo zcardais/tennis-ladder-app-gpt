@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Players</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: linear-gradient(to right, #667eea, #764ba2); }
+    .toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+    }
+    .toast { background: #333; color: #fff; padding: 0.75rem 1.25rem; margin-bottom: 0.5rem; border-radius: 4px; opacity: 0; transition: opacity 0.3s; }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body class="min-h-screen text-gray-800">
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container hidden"></div>
+
+  <div class="max-w-lg mx-auto py-6 px-4">
+    <h1 class="text-white text-2xl font-bold mb-4 text-center">Manage Players</h1>
+    <h2 id="ladder-name" class="text-white text-xl mb-6 text-center">Loading...</h2>
+
+    <div id="player-list" class="space-y-4">
+      <!-- Players will be injected here -->
+    </div>
+  </div>
+
+  <script type="module" src="/src/js/admin-manage-players.js"></script>
+</body>
+</html>
