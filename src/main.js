@@ -42,3 +42,18 @@ function loadPageScripts() {
 }
 
 loadPageScripts();
+
+function highlightActiveTab() {
+  const path = window.location.pathname;
+
+  const navLinks = document.querySelectorAll("nav a");
+  navLinks.forEach(link => {
+    const href = link.getAttribute("href");
+    if (path.endsWith(href)) {
+      link.classList.add("text-blue-600", "font-medium");
+      link.classList.remove("text-gray-400", "text-gray-600");
+    }
+  });
+}
+
+highlightActiveTab();

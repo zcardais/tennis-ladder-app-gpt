@@ -1,6 +1,32 @@
 import { collection, getDocs, deleteDoc, doc, writeBatch, updateDoc, query, where } from "firebase/firestore";
 import { db } from "../firebase-setup.js";
 
+async function recalc(ladderId) {
+  const playersSnap = await getDocs(query(collection(db, "players"), where("ladderId", "==", ladderId)));
+  const matchesSnap = await getDocs(query(collection(db, "challenges"), where("ladderId", "==", ladderId), where("status", "==", "completed")));
+
+  const playerStats = {};
+  playersSnap.forEach(p => {
+    playerStats[p.id] = { id: p.id, name: p.data().name, wins: 0, losses: 0 };
+  });
+
+  matchesSnap.forEach(match => {
+    const data = match.data();
+    const winnerId = Object.keys(playerStats).find(id => playerStats[id].name === data.winner);
+    const loserName = data.challenger === data.winner ? data.opponent : data.challenger;
+    const loserId = Object.keys(playerStats).find(id => playerStats[id].name === loserName);
+    if (winnerId) playerStats[winnerId].wins += 1;
+    if (loserId) playerStats[loserId].losses += 1;
+  });
+
+  const sorted = Object.values(playerStats).sort((a, b) => b.wins - a.wins);
+  const batch = writeBatch(db);
+  sorted.forEach((p, index) => {
+    batch.update(doc(db, "players", p.id), { rank: index + 1 });
+  });
+  await batch.commit();
+}
+
 export async function init() {
   console.log("Admin Ladders page loaded");
 
@@ -31,12 +57,28 @@ export async function init() {
         <p><span class="font-semibold">Dates:</span> ${ladder.startDate || "TBD"} – ${ladder.endDate || "TBD"}</p>
         <p><span class="font-semibold">Sport:</span> ${ladder.sport || "Tennis"}</p>
         <p><span class="font-semibold">Type:</span> ${ladder.type || "N/A"}</p>
+        <p class="text-sm text-gray-700 italic" id="ladder-top-${ladderId}">Loading rankings...</p>
         <div class="flex space-x-2">
           <button class="edit-btn bg-blue-600 text-white px-3 py-1 rounded">Edit</button>
           <button class="delete-btn bg-red-600 text-white px-3 py-1 rounded">Delete</button>
           <a href="players.html?ladderId=${ladderId}" class="bg-indigo-600 text-white px-3 py-1 rounded">Manage Players</a>
         </div>
       `;
+
+      (async () => {
+        const playersSnap = await getDocs(query(collection(db, "players"), where("ladderId", "==", ladderId)));
+        const topPlayers = [];
+        playersSnap.forEach(p => {
+          const d = p.data();
+          if (d.rank && d.rank > 0) {
+            topPlayers.push({ name: d.name, rank: d.rank });
+          }
+        });
+        topPlayers.sort((a, b) => a.rank - b.rank);
+        const preview = topPlayers.slice(0, 3).map(p => `${p.name} (${p.rank})`).join(", ");
+        const previewText = preview ? `Top players: ${preview}` : "No rankings yet";
+        card.querySelector(`#ladder-top-${ladderId}`).textContent = previewText;
+      })();
 
       // Clone Admin Controls template
       const template = document.getElementById("admin-controls-template");
@@ -57,15 +99,26 @@ export async function init() {
           where("ladderId", "==", ladderId),
           where("status", "==", "completed")
         ));
+        const playersSnap = await getDocs(query(collection(db, "players"), where("ladderId", "==", ladderId)));
+        const playersMap = {};
+        playersSnap.forEach(p => {
+          const d = p.data();
+          playersMap[p.id] = { name: d.name, rank: d.rank };
+        });
         matchesSnap.forEach(matchDoc => {
           const m = matchDoc.data();
+          // Find player entries by name
+          const challengerEntry = Object.values(playersMap).find(p => p.name === m.challenger);
+          const opponentEntry = Object.values(playersMap).find(p => p.name === m.opponent);
+          m.challengerRank = challengerEntry ? challengerEntry.rank : "?";
+          m.opponentRank = opponentEntry ? opponentEntry.rank : "?";
           const sets = m.score?.sets || [];
           const scoreStr = sets.map(s => `${s.you}-${s.them}`).join(", ");
           const displayScore = m.rawScore || scoreStr;
           const matchDiv = document.createElement("div");
           matchDiv.className = "flex justify-between items-center mb-2";
           matchDiv.innerHTML = `
-            <span>${m.challenger} def. ${m.opponent} | ${displayScore}</span>
+            <span>${m.challenger} (${m.challengerRank || "?"}) def. ${m.opponent} (${m.opponentRank || "?"}) | ${displayScore}</span>
             <button class="edit-score-btn px-2 py-1 bg-blue-500 text-white rounded" data-match-id="${matchDoc.id}">
               Edit
             </button>
@@ -76,6 +129,11 @@ export async function init() {
         editContainer.querySelectorAll(".edit-score-btn").forEach(btn => {
           btn.addEventListener("click", async () => {
             const matchId = btn.dataset.matchId;
+            const matchDiv = btn.parentElement;
+            // Find the match data again (needed for opponent/challenger display)
+            // We'll find the match object from matchesSnap
+            // For efficiency, we can use the DOM span text and parse it, but let's use the original closure variable if possible.
+            // Instead, let's just get the <span> and update it after the edit.
             const newWinner = prompt("Enter new winner:");
             const newScoreStr = prompt("Enter new score (e.g., 6-4,7-5):");
             if (!newWinner || !newScoreStr) return;
@@ -86,8 +144,30 @@ export async function init() {
               status: "completed"
             });
             await recalc(ladderId);
+            // Re-fetch updated player ranks
+            const updatedPlayersSnap = await getDocs(query(collection(db, "players"), where("ladderId", "==", ladderId)));
+            const updatedPlayersMap = {};
+            updatedPlayersSnap.forEach(p => {
+              const d = p.data();
+              updatedPlayersMap[p.id] = { name: d.name, rank: d.rank };
+            });
+
+            // Find the original match object (m) for this matchId
+            let origMatch = null;
+            matchesSnap.forEach(matchDocIter => {
+              if (matchDocIter.id === matchId) origMatch = matchDocIter.data();
+            });
+            const m = origMatch || {};
+            const loser = m.challenger === newWinner ? m.opponent : m.challenger;
+            // Find winner and loser ranks by name
+            const winnerEntry = Object.values(updatedPlayersMap).find(p => p.name === newWinner);
+            const loserEntry = Object.values(updatedPlayersMap).find(p => p.name === loser);
+            const winnerRank = winnerEntry ? winnerEntry.rank : "?";
+            const loserRank = loserEntry ? loserEntry.rank : "?";
+
             alert("Match updated and rankings recalculated.");
-            location.reload();
+            const matchText = `${newWinner} (${winnerRank}) def. ${loser} (${loserRank}) | ${newScoreStr}`;
+            btn.parentElement.querySelector("span").textContent = matchText;
           });
         });
       })();

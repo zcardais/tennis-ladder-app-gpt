@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase-setup.js";
 
 console.log("Ladders page loaded");
@@ -14,7 +14,7 @@ const ladderType = document.getElementById("ladder-type");
 const joinButton = document.getElementById("join-button");
 const rankingsList = document.getElementById("rankings-list");
 
-const loggedInPlayerId = "tyler"; // TEMP placeholder for testing
+const loggedInPlayerId = "6ty1wGCX2wzAHq4hS737"; // TEMP placeholder for testing
 
 async function loadLadder() {
   if (!ladderId) {
@@ -76,20 +76,66 @@ async function loadLadder() {
   }
 }
 
-function renderRankings(participants) {
+async function renderRankings(participants) {
   rankingsList.innerHTML = "";
-  if (participants.length > 0) {
-	participants.forEach((playerId, index) => {
-	  const playerDiv = document.createElement("div");
-	  playerDiv.className = "flex justify-between items-center p-3 border-b border-gray-200";
-	  playerDiv.innerHTML = `
-		<span class="font-semibold text-gray-800">#${index + 1}</span>
-		<span class="text-gray-700">${playerId}</span>
-	  `;
-	  rankingsList.appendChild(playerDiv);
-	});
-  } else {
-	rankingsList.innerHTML = `<p class="text-gray-500">No rankings to display yet.</p>`;
+  if (participants.length === 0) {
+    rankingsList.innerHTML = `<p class="text-gray-500">No rankings to display yet.</p>`;
+    return;
+  }
+
+  for (let i = 0; i < participants.length; i++) {
+    const playerId = participants[i];
+    const playerRef = doc(db, "players", playerId);
+    const playerSnap = await getDoc(playerRef);
+
+    let fullName = playerId;
+    if (playerSnap.exists()) {
+      const playerData = playerSnap.data();
+      fullName = `${playerData.firstName || ""} ${playerData.lastName || ""}`.trim();
+    }
+
+    const playerDiv = document.createElement("div");
+    playerDiv.className = "flex justify-between items-center p-3 border-b border-gray-200";
+
+    const rankSpan = document.createElement("span");
+    rankSpan.className = "font-semibold text-gray-800 w-10";
+    rankSpan.textContent = `#${i + 1}`;
+
+    const contentWrap = document.createElement("div");
+    contentWrap.className = "flex justify-between items-center flex-1";
+
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "text-gray-700 truncate";
+    nameSpan.textContent = fullName;
+
+    contentWrap.appendChild(nameSpan);
+
+    if (playerId !== loggedInPlayerId) {
+      const challengeBtn = document.createElement("button");
+      challengeBtn.textContent = "Issue Challenge";
+      challengeBtn.className = "ml-4 px-3 py-1 text-sm font-medium text-white rounded-lg shadow bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition whitespace-nowrap";
+      challengeBtn.addEventListener("click", async () => {
+        try {
+          await addDoc(collection(db, "challenges"), {
+            ladderId,
+            challenger: loggedInPlayerId,
+            opponent: playerId,
+            status: "pending",
+            dateIssued: new Date()
+          });
+          alert(`Challenge sent to ${fullName}!`);
+        } catch (err) {
+          console.error("Error issuing challenge:", err);
+          alert("Failed to issue challenge. Please try again.");
+        }
+      });
+      contentWrap.appendChild(challengeBtn);
+    }
+
+    playerDiv.appendChild(rankSpan);
+    playerDiv.appendChild(contentWrap);
+
+    rankingsList.appendChild(playerDiv);
   }
 }
 

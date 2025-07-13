@@ -1,3 +1,4 @@
+
 import {
   collection,
   getDocs,
@@ -7,6 +8,19 @@ import {
   serverTimestamp
 } from "firebase/firestore";
 import { db } from "../firebase-setup.js";
+
+// Toast helper for non-blocking messages
+function showToast(message, type = "success") {
+  const toast = document.createElement("div");
+  toast.className = `fixed bottom-4 left-4 px-4 py-2 rounded shadow-lg text-white z-50 ${
+    type === "success" ? "bg-green-600" : "bg-red-600"
+  }`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
 
 console.log("Challenges.js loaded");
 
@@ -107,22 +121,44 @@ function renderChallenges(challenges) {
 
 window.handleAccept = async function (challengeId) {
   console.log("Accepting challenge:", challengeId);
-  const challengeRef = doc(db, "challenges", challengeId);
-  await updateDoc(challengeRef, {
-    status: "accepted",
-    updatedAt: serverTimestamp()
-  });
-  window.location.reload();
+  const button = event.target;
+  button.disabled = true;
+  button.textContent = "Accepting...";
+  try {
+    const challengeRef = doc(db, "challenges", challengeId);
+    await updateDoc(challengeRef, {
+      status: "accepted",
+      updatedAt: serverTimestamp()
+    });
+    showToast("Challenge accepted!");
+    setTimeout(() => window.location.reload(), 1000);
+  } catch (err) {
+    console.error("Error accepting challenge:", err);
+    showToast("Failed to accept challenge.", "error");
+    button.disabled = false;
+    button.textContent = "Accept";
+  }
 };
 
 window.handleDeny = async function (challengeId) {
   console.log("Denying challenge:", challengeId);
-  const challengeRef = doc(db, "challenges", challengeId);
-  await updateDoc(challengeRef, {
-    status: "denied",
-    updatedAt: serverTimestamp()
-  });
-  window.location.reload();
+  const button = event.target;
+  button.disabled = true;
+  button.textContent = "Denying...";
+  try {
+    const challengeRef = doc(db, "challenges", challengeId);
+    await updateDoc(challengeRef, {
+      status: "denied",
+      updatedAt: serverTimestamp()
+    });
+    showToast("Challenge denied.");
+    setTimeout(() => window.location.reload(), 1000);
+  } catch (err) {
+    console.error("Error denying challenge:", err);
+    showToast("Failed to deny challenge.", "error");
+    button.disabled = false;
+    button.textContent = "Deny";
+  }
 };
 
 window.handleReport = function (challengeId) {

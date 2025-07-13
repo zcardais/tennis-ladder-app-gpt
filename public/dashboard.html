@@ -41,9 +41,10 @@
 
 	<!-- Quick Actions -->
 	<div class="px-6 pb-24 space-y-3">
-	  <a href="report.html" class="block w-full bg-indigo-600 text-white text-center py-3 rounded-xl font-semibold shadow">Report a Score</a>
-	  <a href="profile.html" class="block w-full bg-gray-800 text-white text-center py-3 rounded-xl font-semibold shadow">My Profile</a>
-	  <a href="admin/index.html" class="block w-full bg-red-600 text-white text-center py-3 rounded-xl font-semibold shadow">Admin Panel</a>
+	  <a href="challenges.html#accepted" class="block w-full bg-indigo-600 text-white text-center py-3 rounded-xl font-semibold shadow">Report a Score</a>
+	  <div id="admin-panel-button" class="hidden">
+	    <a href="admin/index.html" class="block w-full bg-red-600 text-white text-center py-3 rounded-xl font-semibold shadow">Admin Panel</a>
+	  </div>
 	</div>
 
 	<!-- Bottom Navigation -->
@@ -84,6 +85,14 @@
 		  </svg>
 		  <span class="text-xs">Profile</span>
 		</a>
+		<nav>
+  <a href="/docs/tasks.md" class="flex flex-col items-center text-xs text-gray-400 hover:text-blue-500">
+    <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v16H4z"></path>
+    </svg>
+    Tasks
+  </a>
+</nav>
 	  </div>
 	</div>
   </div>
@@ -93,7 +102,7 @@
 	const ladders = JSON.parse(localStorage.getItem('ladders') || '[]');
 	const activePlayerId = 'tyler';
 	const joinedLadders = ladders.filter(l => l.participants && l.participants.includes(activePlayerId));
-	const list = document.getElementById('ladder-list');
+	const list = document.getElementById('joined-ladders');
 
 	if (joinedLadders.length === 0) {
 	  list.innerHTML = '<li class="text-white/70">You are not part of any ladders.</li>';
@@ -106,12 +115,22 @@
 			<div class="font-semibold text-sm">${ladder.name}</div>
 			<div class="text-xs text-gray-500">Ends ${ladder.endDate}</div>
 		  </div>
-		  <a href="ladder.html?ladderId=${ladder.id}" class="text-blue-600 text-sm font-semibold underline">View</a>
+		  <div class="flex flex-col items-end space-y-1">
+			<a href="ladder.html?ladderId=${ladder.id}" class="text-blue-600 text-sm font-semibold underline">View Ladder</a>
+			<a href="create-challenge.html?ladderId=${ladder.id}" class="text-indigo-600 text-xs underline">Issue Challenge</a>
+		  </div>
 		`;
 		list.appendChild(li);
 	  });
 	}
   </script>
   <script type="module" src="/src/main.js"></script>
+  <script>
+  // Simulate admin check - update logic when auth is added
+  const isAdmin = localStorage.getItem("isAdmin") === "true";
+  if (isAdmin) {
+    document.getElementById("admin-panel-button").classList.remove("hidden");
+  }
+  </script>
 </body>
 </html>

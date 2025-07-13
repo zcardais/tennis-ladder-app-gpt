@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Issue Challenge</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-b from-blue-500 to-purple-600 min-h-screen flex flex-col text-white">
+  <header class="p-4 flex justify-between items-center">
+    <h1 class="text-lg font-bold">New Challenge</h1>
+    <a href="dashboard.html" class="text-sm text-white/80 hover:underline">← Back</a>
+  </header>
+  <main class="flex-1 bg-white rounded-t-3xl shadow-inner p-4 overflow-y-auto max-w-md mx-auto w-full pb-48">
+    <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-3 rounded-md mb-4">
+      <p class="text-sm font-medium">Challenge Rules</p>
+      <p class="text-xs">You can challenge players up to 3 positions above you</p>
+    </div>
+
+    <h2 class="text-lg font-bold text-gray-800 mb-4">Select Opponent</h2>
+
+    <div id="opponent-list" class="space-y-3">
+      <!-- Opponent options injected by JS -->
+    </div>
+
+    <form id="challenge-form" class="mt-6 space-y-6">
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Message (Optional)</label>
+        <textarea id="message" name="message" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none" placeholder="Add a message to your challenge..."></textarea>
+      </div>
+
+      <button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl font-semibold shadow hover:opacity-90 transition">
+        Send Challenge
+      </button>
+      <p id="status-message" class="text-sm text-center text-gray-500 mt-4 hidden">Submitting…</p>
+    </form>
+  </main>
+  
+  <script type="module" src="/src/js/create-challenge.js"></script>
+  <script type="module" src="/src/main.js"></script>
+   <!-- Bottom Navigation -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300">
+	<div class="flex justify-around py-3">
+	  <a href="dashboard.html" class="flex flex-col items-center text-gray-400">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+			d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+		</svg>
+		<span class="text-xs">Home</span>
+	  </a>
+	  <a href="ladder.html" class="flex flex-col items-center text-blue-600">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+			d="M3 10h18M3 6h18M3 14h18M3 18h18"/>
+		</svg>
+		<span class="text-xs font-medium">Ladders</span>
+	  </a>
+	  <a href="challenges.html" class="flex flex-col items-center text-gray-400">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+			d="M17 8h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V10a2 2 0 012-2h2M12 15v2m0-6v2m0-6v2m0-6v2"/>
+		</svg>
+		<span class="text-xs">Challenges</span>
+	  </a>
+	  <a href="stats.html" class="flex flex-col items-center text-gray-400">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+			d="M11 3h2v18h-2V3zm4 6h2v12h-2V9zm-8 6h2v6H7v-6z"/>
+		</svg>
+		<span class="text-xs">Stats</span>
+	  </a>
+	  <a href="profile.html" class="flex flex-col items-center text-gray-400">
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+			d="M5.121 17.804A9 9 0 1118.879 6.196 9 9 0 015.121 17.804z"/>
+		</svg>
+		<span class="text-xs">Profile</span>
+	  </a>
+	</div>
+  </div>
+</body>
+</html>

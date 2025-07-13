@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, serverTimestamp, collection, addDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, serverTimestamp, collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase-setup.js";
 
 // Toast helper for non-blocking messages
@@ -56,14 +56,41 @@ async function loadMatchDetails() {
 
   const summaryEl = document.getElementById("match-summary");
   const { challenger, opponent, dateIssued } = data;
-  const dateObj = dateIssued.toDate();
-const dateStr = dateObj.toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-});
+  let dateStr = "Unknown";
+  if (dateIssued?.toDate) {
+    const dateObj = dateIssued.toDate();
+    dateStr = dateObj.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  } else if (typeof dateIssued === "string") {
+    dateStr = new Date(dateIssued).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  // Fetch ladderId and player ranks
+  const ladderId = data.ladderId;
+  const playersQuery = query(collection(db, "players"), where("ladderId", "==", ladderId));
+  const playersSnap = await getDocs(playersQuery);
+  const rankMap = {};
+  playersSnap.forEach(p => {
+    const d = p.data();
+    rankMap[d.name] = d.rank;
+  });
+  // Debug logging for rank mapping
+  console.log("Player rank map:", rankMap);
+  console.log("Challenger:", challenger, "→ Rank:", rankMap[challenger]);
+  console.log("Opponent:", opponent, "→ Rank:", rankMap[opponent]);
+
+  const challengerRank = rankMap[challenger] || "?";
+  const opponentRank = rankMap[opponent] || "?";
+
   summaryEl.innerHTML = `
-    <p class="font-semibold text-lg">${challenger} vs. ${opponent}</p>
+    <p class="font-semibold text-lg">${challenger} (${challengerRank}) vs. ${opponent} (${opponentRank})</p>
     <p class="text-sm text-white/70 mt-1">Date Issued: ${dateStr}</p>
   `;
 }
@@ -142,7 +169,7 @@ reportForm.addEventListener("submit", async (e) => {
     showToast("Failed to save score. Try again.");
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = "Submit Score for Confirmation";
+    submitBtn.textContent = "Submit Score";
   }
 });
 
