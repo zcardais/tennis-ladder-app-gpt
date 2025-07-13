@@ -70,58 +70,8 @@
 
 </div>
 
-<script type="module">
-  import { db } from "/src/firebase-setup.js";
-  import { collection, query, where, getDocs, updateDoc } from "firebase/firestore";
-
-  const loggedInPlayerId = "6ty1wGCX2wzAHq4hS737"; // Update to simulate different users
-  const feed = document.getElementById("challenges-feed");
-
-  async function loadIncomingChallenges() {
-    feed.innerHTML = ""; // Clear existing
-
-    const q = query(
-      collection(db, "challenges"),
-      where("opponent", "==", loggedInPlayerId),
-      where("status", "==", "pending")
-    );
-
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) {
-      feed.innerHTML = `<div class="text-white text-sm italic">No pending challenges.</div>`;
-      return;
-    }
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const card = document.createElement("div");
-      card.className = "bg-white rounded-lg shadow p-4";
-      card.innerHTML = `
-        <div class="text-sm font-semibold mb-2 text-gray-800">Challenger: ${data.challenger}</div>
-        <div class="text-xs text-gray-500 mb-2">Issued on: ${data.dateIssued?.toDate().toLocaleDateString() || "Unknown"}</div>
-        <div class="flex space-x-2">
-          <button class="accept-btn bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">Accept</button>
-          <button class="deny-btn bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">Deny</button>
-        </div>
-      `;
-
-      card.querySelector(".accept-btn").addEventListener("click", async () => {
-        await updateDoc(doc.ref, { status: "accepted" });
-        loadIncomingChallenges(); // refresh
-      });
-
-      card.querySelector(".deny-btn").addEventListener("click", async () => {
-        await updateDoc(doc.ref, { status: "denied" });
-        loadIncomingChallenges(); // refresh
-      });
-
-      feed.appendChild(card);
-    });
-  }
-
-  loadIncomingChallenges();
-</script>
-
+<script type="module" src="/src/js/challenges.js"></script>
 <script type="module" src="/src/main.js"></script>
+<script type="module" src="/src/js/logout.js"></script>
 </body>
 </html>

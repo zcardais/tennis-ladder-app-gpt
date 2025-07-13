@@ -1,4 +1,3 @@
-
 import {
   collection,
   getDocs,
@@ -8,6 +7,9 @@ import {
   serverTimestamp
 } from "firebase/firestore";
 import { db } from "../firebase-setup.js";
+import { auth } from "../firebase-setup.js";
+import { onAuthStateChanged } from "firebase/auth";
+import { query, where } from "firebase/firestore";
 
 // Toast helper for non-blocking messages
 function showToast(message, type = "success") {
@@ -24,16 +26,24 @@ function showToast(message, type = "success") {
 
 console.log("Challenges.js loaded");
 
-async function fetchChallenges() {
-  const querySnapshot = await getDocs(collection(db, "challenges"));
-  const challenges = [];
-  querySnapshot.forEach((docSnap) => {
-    const data = docSnap.data();
-    challenges.push({
-      id: docSnap.id,
-      ...data
-    });
+async function fetchChallenges(uid) {
+  const q1 = query(collection(db, "challenges"), where("challenger", "==", uid));
+  const q2 = query(collection(db, "challenges"), where("opponent", "==", uid));
+
+  const [snap1, snap2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+  const allDocs = [...snap1.docs, ...snap2.docs];
+  const uniqueDocs = new Map();
+  allDocs.forEach(docSnap => {
+    if (!uniqueDocs.has(docSnap.id)) {
+      uniqueDocs.set(docSnap.id, docSnap);
+    }
   });
+
+  const challenges = [];
+  uniqueDocs.forEach(docSnap => {
+    challenges.push({ id: docSnap.id, ...docSnap.data() });
+  });
+
   console.log("Fetched challenges:", challenges);
   return challenges;
 }
@@ -49,7 +59,7 @@ function formatDate(dateIssued) {
   }
 }
 
-function renderChallenges(challenges) {
+function renderChallenges(challenges, currentUid) {
   const feed = document.getElementById("challenges-feed");
   const history = document.getElementById("history-feed");
 
@@ -68,14 +78,22 @@ function renderChallenges(challenges) {
     `;
 
     if (challenge.status === "pending") {
-      html += `
-        <p class="font-bold text-lg">${challenge.challenger} vs. ${challenge.opponent}</p>
-        <p class="text-gray-600">Date Issued: ${formattedDate}</p>
-        <div class="mt-2 flex space-x-2">
-          <button onclick="handleAccept('${challenge.id}')" class="bg-green-500 text-white px-3 py-1 rounded">Accept</button>
-          <button onclick="handleDeny('${challenge.id}')" class="bg-red-500 text-white px-3 py-1 rounded">Deny</button>
-        </div>
-      `;
+      if (challenge.opponent === currentUid) {
+        html += `
+          <p class="font-bold text-lg">${challenge.challenger} vs. ${challenge.opponent}</p>
+          <p class="text-gray-600">Date Issued: ${formattedDate}</p>
+          <div class="mt-2 flex space-x-2">
+            <button onclick="handleAccept('${challenge.id}')" class="bg-green-500 text-white px-3 py-1 rounded">Accept</button>
+            <button onclick="handleDeny('${challenge.id}')" class="bg-red-500 text-white px-3 py-1 rounded">Deny</button>
+          </div>
+        `;
+      } else {
+        html += `
+          <p class="font-bold text-lg">${challenge.challenger} vs. ${challenge.opponent}</p>
+          <p class="text-gray-600">Date Issued: ${formattedDate}</p>
+          <p class="italic text-gray-500 mt-2">Waiting for opponent to accept...</p>
+        `;
+      }
       html += `</div>`;
       feed.innerHTML += html;
     } else if (challenge.status === "accepted") {
@@ -169,12 +187,19 @@ window.handleReport = function (challengeId) {
 /**
  * init - entry point called by main.js
  */
-export async function init() {
-  console.log("Challenges init");
-  try {
-    const challenges = await fetchChallenges();
-    renderChallenges(challenges);
-  } catch (err) {
-    console.error("🔥 Error initializing challenges:", err);
-  }
+export function init() {
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      window.location.href = "/auth.html";
+      return;
+    }
+
+    console.log("Challenges init for user:", user.uid);
+    try {
+      const challenges = await fetchChallenges(user.uid);
+      renderChallenges(challenges, user.uid);
+    } catch (err) {
+      console.error("🔥 Error initializing challenges:", err);
+    }
+  });
 }
