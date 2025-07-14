@@ -14,6 +14,8 @@ function loadPageScripts() {
 	import('./js/stats.js').then(module => module.init());
   } else if (page.endsWith('report.html')) {
 	import('./js/report.js').then(module => module.init());
+  } else if (page.endsWith('invite.html')) {
+    import('./js/invite-alt.js').then(module => module.init());
   }
 
   // 🔽 Move admin check above ladder.html
@@ -48,8 +50,8 @@ function highlightActiveTab() {
 
   const navLinks = document.querySelectorAll("nav a");
   navLinks.forEach(link => {
-    const href = link.getAttribute("href");
-    if (path.endsWith(href)) {
+    const href = new URL(link.href).pathname;
+    if (path === href) {
       link.classList.add("text-blue-600", "font-medium");
       link.classList.remove("text-gray-400", "text-gray-600");
     }
@@ -57,3 +59,28 @@ function highlightActiveTab() {
 }
 
 highlightActiveTab();
+
+// Dynamically update the Ladders nav link based on the current user's ladder memberships
+import { auth, db } from './firebase-setup.js';
+import { doc, getDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+
+function updateLadderNavLink() {
+  const ladderLink = document.querySelector("nav a[href*='ladder.html']");
+  if (!ladderLink) return;
+
+  onAuthStateChanged(auth, async user => {
+    if (!user) return;
+
+    const docRef = doc(db, "players", user.uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      if (data.ladders && data.ladders.length > 0) {
+        ladderLink.href = `/ladder.html?ladderId=${data.ladders[0]}`;
+      }
+    }
+  });
+}
+
+updateLadderNavLink();

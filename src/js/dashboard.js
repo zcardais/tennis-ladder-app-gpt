@@ -1,14 +1,16 @@
 // Add dashboard-specific logic here
 import { db } from '../firebase-setup.js';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { auth } from '../firebase-setup.js';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export async function init() {
   console.log("Dashboard loaded");
 
-  const loggedInPlayerId = '6ty1wGCX2wzAHq4hS737'; // Replace with real auth user later
   const laddersList = document.getElementById('joined-ladders');
 
-  async function fetchJoinedLadders() {
+  async function fetchJoinedLadders(uid) {
+    let ladderCount = 0;
     try {
       const querySnapshot = await getDocs(collection(db, 'ladders'));
       let hasLadders = false;
@@ -18,7 +20,8 @@ export async function init() {
         const ladder = doc.data();
         const participants = ladder.participants || [];
 
-        if (participants.includes(loggedInPlayerId)) {
+        if (participants.includes(uid)) {
+          ladderCount++;
           hasLadders = true;
           joinedAny = true;
 
@@ -41,6 +44,8 @@ export async function init() {
         }
       });
 
+      document.getElementById('stat-ladders').textContent = ladderCount;
+
       if (!hasLadders) {
         laddersList.innerHTML = `
           <div class="text-center text-white/70 py-8">
@@ -60,5 +65,20 @@ export async function init() {
     }
   }
 
-  fetchJoinedLadders();
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = '/auth.html';
+      return;
+    }
+
+    const uid = user.uid;
+    const playerRef = doc(db, 'players', uid);
+    const playerSnap = await getDoc(playerRef);
+    if (playerSnap.exists()) {
+      const player = playerSnap.data();
+      const displayName = `${player.firstName} ${player.lastName}`;
+      document.getElementById('user-name').textContent = displayName;
+      fetchJoinedLadders(uid);
+    }
+  });
 }

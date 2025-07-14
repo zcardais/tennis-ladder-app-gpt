@@ -14,25 +14,25 @@
 	<div class="px-6 pt-6 pb-4 flex justify-between items-center text-white">
 	  <h1 class="text-xl font-bold">Welcome back!</h1>
 	  <div class="flex items-center gap-4">
-	    <div class="text-sm font-medium">Tyler Jones</div>
+	    <div id="user-name" class="text-sm font-medium">Loading...</div>
 	    <button id="logout-btn" class="text-xs bg-white text-indigo-600 font-semibold py-1 px-2 rounded hover:bg-indigo-100">Logout</button>
 	  </div>
 	</div>
 
 	<!-- Ladder Stats -->
 	<div class="px-6 pb-4">
-	  <div class="bg-white rounded-xl shadow-md p-6 flex justify-between text-center text-sm">
+	  <div class="rounded-xl border border-white/50 p-4 flex justify-between text-center text-sm text-white">
 		<div>
-		  <p class="text-xl font-bold text-indigo-600">3</p>
-		  <p class="text-gray-500">Ladders</p>
+		  <p id="stat-ladders" class="text-2xl font-bold text-white">0</p>
+		  <p class="text-sm text-white/80 leading-tight">Active<br />Ladders</p>
 		</div>
 		<div>
-		  <p class="text-xl font-bold text-indigo-600">5</p>
-		  <p class="text-gray-500">Challenges</p>
+		  <p id="stat-challenges" class="text-2xl font-bold text-white">0</p>
+		  <p class="text-sm text-white/80 leading-tight">Pending<br />Challenges</p>
 		</div>
 		<div>
-		  <p class="text-xl font-bold text-indigo-600">12</p>
-		  <p class="text-gray-500">Matches</p>
+		  <p id="stat-matches" class="text-2xl font-bold text-white">0</p>
+		  <p class="text-sm text-white/80 leading-tight">Matches<br />This Month</p>
 		</div>
 	  </div>
 	</div>
@@ -102,32 +102,7 @@
   </div>
 
   <!-- Ladder Script -->
-  <script>
-	const ladders = JSON.parse(localStorage.getItem('ladders') || '[]');
-	const activePlayerId = 'tyler';
-	const joinedLadders = ladders.filter(l => l.participants && l.participants.includes(activePlayerId));
-	const list = document.getElementById('joined-ladders');
-
-	if (joinedLadders.length === 0) {
-	  list.innerHTML = '<li class="text-white/70">You are not part of any ladders.</li>';
-	} else {
-	  joinedLadders.forEach(ladder => {
-		const li = document.createElement('li');
-		li.className = "bg-white p-4 rounded-xl shadow flex justify-between items-center";
-		li.innerHTML = `
-		  <div>
-			<div class="font-semibold text-sm">${ladder.name}</div>
-			<div class="text-xs text-gray-500">Ends ${ladder.endDate}</div>
-		  </div>
-		  <div class="flex flex-col items-end space-y-1">
-			<a href="ladder.html?ladderId=${ladder.id}" class="text-blue-600 text-sm font-semibold underline">View Ladder</a>
-			<a href="create-challenge.html?ladderId=${ladder.id}" class="text-indigo-600 text-xs underline">Issue Challenge</a>
-		  </div>
-		`;
-		list.appendChild(li);
-	  });
-	}
-  </script>
+  <script type="module" src="/src/js/dashboard.js"></script>
   <script type="module" src="/src/main.js"></script>
   <script>
     // Simulate admin check - update logic when auth is added
