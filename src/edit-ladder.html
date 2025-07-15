@@ -107,9 +107,45 @@
         <span>Allow players to join from their dashboard</span>
       </label>
 
-      <div class="pt-6">
-        <button id="save-button" type="submit" class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
-        <div id="saving-spinner" class="hidden inline-block ml-4">Saving…</div>
+      <hr class="my-6 border-gray-300">
+
+      <fieldset class="border border-gray-300 p-4 rounded">
+        <legend class="text-sm font-medium text-gray-700 px-2">Ladder Rules Configuration</legend>
+
+        <label class="block">
+          <span class="text-sm text-gray-600">Challenge Range</span>
+          <input id="challengeRange" type="number" min="1" class="mt-1 block w-full border rounded p-2" placeholder="e.g. 3" />
+        </label>
+
+        <label class="block">
+          <span class="text-sm text-gray-600">Auto-Forfeit Window (days)</span>
+          <input id="autoForfeitDays" type="number" min="1" class="mt-1 block w-full border rounded p-2" placeholder="e.g. 5" />
+        </label>
+
+        <label class="block">
+          <span class="text-sm text-gray-600">Score Format</span>
+          <select id="scoreFormat" class="mt-1 block w-full border rounded p-2">
+            <option value="sets">Sets</option>
+            <option value="games">Games</option>
+          </select>
+        </label>
+
+        <div class="flex items-center space-x-2">
+          <input id="notifyOnChallenge" type="checkbox" class="form-checkbox" />
+          <label for="notifyOnChallenge" class="text-sm text-gray-700">Email players when a challenge is issued</label>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <input id="notifyOnResult" type="checkbox" class="form-checkbox" />
+          <label for="notifyOnResult" class="text-sm text-gray-700">Email players when a result is submitted</label>
+        </div>
+      </fieldset>
+
+      <div class="pt-6 flex items-center space-x-4">
+        <button id="save-button" type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded focus:outline-none">
+          Save Changes
+        </button>
+        <div id="saving-spinner" class="text-white hidden">Saving…</div>
       </div>
 
     </form>

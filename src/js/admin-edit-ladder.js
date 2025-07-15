@@ -69,6 +69,12 @@ async function init() {
     allowJoinInput.checked = !!data.allowJoining;
     sportInput.value = (data.sport || "tennis").toLowerCase();
     typeInput.value = (data.type || "singles").toLowerCase();
+
+    document.getElementById("challengeRange").value = data.challengeRange || "";
+    document.getElementById("autoForfeitDays").value = data.autoForfeitDays || "";
+    document.getElementById("scoreFormat").value = data.scoreFormat || "sets";
+    document.getElementById("notifyOnChallenge").checked = !!data.notifyOnChallenge;
+    document.getElementById("notifyOnResult").checked = !!data.notifyOnResult;
   } catch (error) {
     console.error("🔥 Error loading ladder:", error);
     showToast("Error loading ladder");
@@ -90,6 +96,11 @@ async function init() {
       sport: sportInput.value,
       type: typeInput.value,
       updatedAt: serverTimestamp(),
+      challengeRange: parseInt(document.getElementById("challengeRange").value, 10) || 0,
+      autoForfeitDays: parseInt(document.getElementById("autoForfeitDays").value, 10) || 0,
+      scoreFormat: document.getElementById("scoreFormat").value,
+      notifyOnChallenge: document.getElementById("notifyOnChallenge").checked,
+      notifyOnResult: document.getElementById("notifyOnResult").checked,
     };
 
     try {
