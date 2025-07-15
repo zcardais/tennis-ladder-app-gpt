@@ -14,9 +14,11 @@
   },
   "main": "index.js",
   "dependencies": {
-    "firebase-admin": "^12.6.0",
+    "@sendgrid/mail": "^8.1.5",
+    "firebase": "^11.10.0",
+    "firebase-admin": "^12.7.0",
     "firebase-functions": "^4.0.0",
-    "@sendgrid/mail": "^8.1.5"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "eslint": "^8.15.0",

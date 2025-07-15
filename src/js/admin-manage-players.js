@@ -96,7 +96,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const q = query(playersRef, where("__name__", "in", chunk));
       const snap = await getDocs(q);
       snap.forEach((doc) => {
-        allPlayers.push({ id: doc.id, ...doc.data() });
+        const player = { id: doc.id, ...doc.data() };
+        if (player.ladderId !== ladderId) {
+          console.warn(`⚠️ Player ${player.email} belongs to ${player.ladderId}, not ${ladderId}`);
+        }
+        allPlayers.push(player);
       });
     }
 
@@ -132,6 +136,26 @@ document.addEventListener("DOMContentLoaded", () => {
       const buttonContainer = document.createElement("div");
       buttonContainer.appendChild(editButton);
       buttonContainer.appendChild(removeButton);
+
+      if (player.inviteId) {
+        const resendButton = document.createElement("button");
+        resendButton.className = "text-yellow-600 hover:underline ml-2";
+        resendButton.textContent = "Resend Invite";
+        resendButton.addEventListener("click", async () => {
+          try {
+            await fetch("/resendLadderInvite", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: player.email, inviteId: player.inviteId }),
+            });
+            alert(`Invite resent to ${player.email}`);
+          } catch (err) {
+            console.error(err);
+            alert("Failed to resend invite.");
+          }
+        });
+        buttonContainer.appendChild(resendButton);
+      }
 
       li.appendChild(nameSpan);
       li.appendChild(buttonContainer);
