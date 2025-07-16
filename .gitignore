@@ -1,2 +1,14 @@
 .DS_Store
 appAlchemy designs/
+
+node_modules/
+*.local
+
+# Firebase service keys and logs
+serviceAccountKey.json
+firebase-debug.log
+*.log
+
+# Script utilities
+seed-test-data.cjs
+reset-test-data.cjs

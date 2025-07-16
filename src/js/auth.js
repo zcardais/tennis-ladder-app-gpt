@@ -1,6 +1,8 @@
 import { auth, db } from '../firebase-setup.js';
 import {
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   onAuthStateChanged
 } from 'firebase/auth';
 import {
@@ -66,6 +68,13 @@ document.getElementById('signup-form')?.addEventListener('submit', async (e) => 
           await updateDoc(ladderRef, {
             participants: arrayUnion(uid),
           });
+          await setDoc(doc(db, `ladders/${ladderId}/players`, uid), {
+            email,
+            firstName: playerDoc.firstName,
+            lastName: playerDoc.lastName,
+            username: playerDoc.username,
+            joinedAt: serverTimestamp()
+          });
         }
         await updateDoc(inviteRef, { status: 'accepted', acceptedAt: serverTimestamp() });
       }
@@ -79,5 +88,44 @@ document.getElementById('signup-form')?.addEventListener('submit', async (e) => 
   } catch (err) {
     console.error('Error creating user:', err);
     status.textContent = `❌ ${err.message}`;
+  }
+});
+
+// Login logic
+document.getElementById('login-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const loginStatus = document.getElementById('loginStatus');
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    loginStatus.textContent = '✅ Login successful! Redirecting...';
+    setTimeout(() => {
+      window.location.href = '/dashboard.html';
+    }, 1000);
+  } catch (err) {
+    console.error('Login error:', err);
+    loginStatus.textContent = `❌ ${err.message}`;
+  }
+});
+
+// Password reset logic
+document.getElementById('resetPasswordBtn')?.addEventListener('click', async () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const loginStatus = document.getElementById('loginStatus');
+
+  if (!email) {
+    loginStatus.textContent = '❌ Please enter your email to reset your password.';
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    loginStatus.textContent = '✅ Password reset email sent!';
+  } catch (err) {
+    console.error('Password reset error:', err);
+    loginStatus.textContent = `❌ ${err.message}`;
   }
 });

@@ -1,9 +1,9 @@
 const admin = require("firebase-admin");
-const { v4: uuidv4 } = require("uuid"); // install this if not already: npm install uuid
+const {v4: uuidv4} = require("uuid"); // install this if not already: npm install uuid
 const serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
 
 const db = admin.firestore();
@@ -29,11 +29,11 @@ async function assignInviteIds() {
       ladderId: player.ladderId,
       username: player.username || player.email.split("@")[0],
       sentAt: new Date(),
-      status: "backfilled"
+      status: "backfilled",
     };
 
     await db.collection("ladderInvites").doc(newInviteId).set(inviteData);
-    await playerRef.update({ inviteId: newInviteId });
+    await playerRef.update({inviteId: newInviteId});
 
     console.log(`✅ Created invite for: ${player.email}`);
     createdCount++;

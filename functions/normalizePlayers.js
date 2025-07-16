@@ -2,7 +2,7 @@ const admin = require("firebase-admin");
 const serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
 
 const db = admin.firestore();
@@ -10,7 +10,7 @@ const db = admin.firestore();
 async function normalizePlayers() {
   const invitesSnap = await db.collection("ladderInvites").get();
   const invitesByEmail = {};
-  invitesSnap.forEach(doc => {
+  invitesSnap.forEach((doc) => {
     const data = doc.data();
     invitesByEmail[data.email] = doc.id;
   });

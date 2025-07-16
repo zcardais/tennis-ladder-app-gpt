@@ -1,16 +1,42 @@
 <!-- public/auth.html -->
-<form id="signup-form" class="space-y-4 max-w-md">
-  <input type="text" id="firstName" placeholder="First Name" class="w-full p-2 border rounded bg-gray-100" readonly />
-  <input type="text" id="lastName" placeholder="Last Name" class="w-full p-2 border rounded bg-gray-100" readonly />
-  <input type="text" id="username" placeholder="Username" class="w-full p-2 border rounded bg-gray-100" readonly />
-  <input type="email" id="email" placeholder="Email" class="w-full p-2 border rounded bg-gray-100" readonly />
+<div class="flex space-x-4 mb-4">
+  <button id="show-signup" class="px-3 py-1 bg-blue-200 rounded">Sign Up</button>
+  <button id="show-login" class="px-3 py-1 bg-gray-200 rounded">Log In</button>
+</div>
 
-  <input type="password" id="password" placeholder="Create Password" class="w-full p-2 border rounded" required />
-  <input type="password" id="confirmPassword" placeholder="Confirm Password" class="w-full p-2 border rounded" required />
+<div id="signup-section">
+  <form id="signup-form" class="space-y-4 max-w-md">
+    <input type="text" id="firstName" placeholder="First Name" class="w-full p-2 border rounded bg-gray-100"/>
+    <input type="text" id="lastName" placeholder="Last Name" class="w-full p-2 border rounded bg-gray-100"/>
+    <input type="text" id="username" placeholder="Username" class="w-full p-2 border rounded bg-gray-100"/>
+    <input type="email" id="email" placeholder="Email" class="w-full p-2 border rounded bg-gray-100"/>
 
-  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Create My Account</button>
-</form>
+    <input type="password" id="password" placeholder="Create Password" class="w-full p-2 border rounded" required />
+    <input type="password" id="confirmPassword" placeholder="Confirm Password" class="w-full p-2 border rounded" required />
 
-<div id="status" class="mt-4 text-sm text-green-600"></div>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Create My Account</button>
+  </form>
+  <div id="status" class="mt-4 text-sm text-green-600"></div>
+</div>
+
+<div id="login-section" style="display: none;" class="space-y-4 max-w-md">
+  <input type="email" id="loginEmail" placeholder="Email" class="w-full p-2 border rounded bg-gray-100" />
+  <input type="password" id="loginPassword" placeholder="Password" class="w-full p-2 border rounded" />
+  <button id="loginBtn" type="submit" form="login-form" class="bg-green-600 text-white px-4 py-2 rounded">Log In</button>
+  <button id="resetPasswordBtn" class="bg-yellow-500 text-white px-3 py-1 rounded">Reset Password</button>
+  <div id="loginStatus" class="mt-2 text-sm text-green-600"></div>
+  <form id="login-form"></form>
+</div>
 
 <script type="module" src="/src/js/auth.js"></script>
+<script>
+  document.getElementById("show-login").addEventListener("click", () => {
+    document.getElementById("signup-section").style.display = "none";
+    document.getElementById("login-section").style.display = "block";
+  });
+
+  document.getElementById("show-signup").addEventListener("click", () => {
+    document.getElementById("signup-section").style.display = "block";
+    document.getElementById("login-section").style.display = "none";
+  });
+</script>

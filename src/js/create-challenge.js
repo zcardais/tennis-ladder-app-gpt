@@ -1,5 +1,5 @@
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
-
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { db } from "../firebase-setup.js";
 console.log("✅ DB Loaded:", db);
 
@@ -9,7 +9,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const opponentList = document.getElementById("opponent-list");
 
   let selectedOpponent = null;
-  const challenger = "zach"; // 🔧 Replace with real user ID when auth is added
+  const auth = getAuth();
+  let challenger = null;
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      challenger = user.uid;
+    } else {
+      window.location.href = "/auth.html";
+    }
+  });
 
   const params = new URLSearchParams(window.location.search);
   const ladderId = params.get("ladderId");
@@ -90,6 +98,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     statusMessage.textContent = "Submitting...";
     statusMessage.classList.remove("hidden");
+
+    // Check for duplicate open challenge to same player
+    const challengeQuery = query(
+      collection(db, "challenges"),
+      where("ladderId", "==", ladderId),
+      where("challenger", "==", challenger),
+      where("opponent", "==", selectedOpponent),
+      where("status", "in", ["pending", "accepted"])
+    );
+    const existingChallenges = await getDocs(challengeQuery);
+
+    if (!existingChallenges.empty) {
+      alert("You already have an open challenge to this player.");
+      statusMessage.textContent = "";
+      statusMessage.classList.add("hidden");
+      return;
+    }
 
     try {
       await addDoc(collection(db, "challenges"), {
