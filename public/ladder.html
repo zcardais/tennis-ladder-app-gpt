@@ -12,24 +12,47 @@
 	<!-- Page Heading -->
 	<h1 id="ladder-name" class="text-2xl font-bold text-white text-center mb-6">Loading Ladder...</h1>
 
-	<!-- Ladder Info Card -->
-	<div class="bg-white rounded-xl shadow-md p-6 mb-6">
-	  <p class="text-lg"><span class="font-semibold">Start:</span> <span id="start-date" class="text-gray-700">Loading...</span></p>
-	  <p class="text-lg"><span class="font-semibold">End:</span> <span id="end-date" class="text-gray-700">Loading...</span></p>
-	  <p class="text-lg"><span class="font-semibold">Type:</span> <span id="ladder-type" class="text-gray-700">Loading...</span></p>
-
-	  <div class="mt-4">
-		<button id="join-button" class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
-		  Loading...
-		</button>
+	<!-- Ladder Overview (Gradient-aligned style) -->
+	<div class="mb-6 text-sm text-white">
+	  <div class="flex justify-between items-center">
+		<div>
+		  <p id="season-dates" class="text-base font-semibold">TBD – TBD</p>
+		</div>
+		<div>
+		  <p id="ends-in" class="text-sm italic">End date TBD</p>
+		</div>
+	  </div>
+	  <div class="mt-4 border border-white/30 rounded-xl px-4 py-3 backdrop-blur-sm bg-white/5">
+		<div class="flex items-center justify-between">
+			<div class="flex items-center space-x-4">
+			  <div id="your-rank" class="w-12 h-12 bg-gradient-to-br from-yellow-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl">–</div>
+			  <span id="your-name" class="text-xl text-white/80 font-normal">Loading...</span>
+			</div>
+		  <div class="flex flex-col items-end">
+			<span class="text-sm text-white/70">Record</span>
+			<span id="your-record" class="text-xl font-bold text-white">–</span>
+		  </div>
+		</div>
 	  </div>
 	</div>
 
 	<!-- Rankings Section -->
 	<div>
 	  <h2 class="text-xl font-semibold text-white mb-4">Rankings</h2>
-	  <div id="rankings-list" class="bg-white rounded-xl shadow-md p-6">
-		<p class="text-gray-500">No rankings to display yet.</p>
+	  <div id="rankings-list" class="bg-white rounded-xl shadow-md overflow-x-auto">
+		<table class="min-w-full text-sm text-left text-gray-600">
+		  <thead class="bg-gray-100 text-xs uppercase text-gray-500">
+			<tr>
+			  <th scope="col" class="px-4 py-3">Rank</th>
+			  <th scope="col" class="px-4 py-3">Player</th>
+			  <th scope="col" class="px-4 py-3">Record</th>
+			  <th scope="col" class="px-4 py-3">Action</th>
+			</tr>
+		  </thead>
+		  <tbody id="rankings-body">
+			<!-- JS will inject player rows here -->
+		  </tbody>
+		</table>
 	  </div>
 	</div>
   </div>

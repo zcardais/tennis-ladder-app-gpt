@@ -21,7 +21,7 @@
 - [x] Show ranked participants with full names
 - [x] Display “Issue Challenge” buttons (except self)
 - [x] Instantly create `challenges` doc on button click
-- [ ] Prevent issuing a challenge if one is already pending
+- [x] Prevent issuing a challenge if one is already pending
 
 ---
 
@@ -46,7 +46,7 @@
 - [x] Challenge a player, switch users, and view incoming challenge
 - [x] Accept the challenge → confirm Firestore update
 - [x] Deny a challenge → confirm it disappears
-- [ ] Prevent duplicate open challenges to same player
+- [x] Prevent duplicate open challenges to same player
 - [x] Validate challenge state transitions across all pages
 
 ---

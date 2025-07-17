@@ -56,6 +56,15 @@ async function loadMatchDetails() {
 
   const summaryEl = document.getElementById("match-summary");
   const { challenger, opponent, dateIssued } = data;
+
+  const getName = async (uid) => {
+    const playerSnap = await getDoc(doc(db, "players", uid));
+    return playerSnap.exists() ? playerSnap.data().firstName || uid : uid;
+  };
+
+  const challengerName = await getName(challenger);
+  const opponentName = await getName(opponent);
+
   let dateStr = "Unknown";
   if (dateIssued?.toDate) {
     const dateObj = dateIssued.toDate();
@@ -74,23 +83,18 @@ async function loadMatchDetails() {
 
   // Fetch ladderId and player ranks
   const ladderId = data.ladderId;
-  const playersQuery = query(collection(db, "players"), where("ladderId", "==", ladderId));
-  const playersSnap = await getDocs(playersQuery);
-  const rankMap = {};
-  playersSnap.forEach(p => {
-    const d = p.data();
-    rankMap[d.name] = d.rank;
-  });
-  // Debug logging for rank mapping
-  console.log("Player rank map:", rankMap);
-  console.log("Challenger:", challenger, "→ Rank:", rankMap[challenger]);
-  console.log("Opponent:", opponent, "→ Rank:", rankMap[opponent]);
 
-  const challengerRank = rankMap[challenger] || "?";
-  const opponentRank = rankMap[opponent] || "?";
+  const getRank = async (ladderId, uid) => {
+    const playerRef = doc(db, "ladders", ladderId, "players", uid);
+    const playerSnap = await getDoc(playerRef);
+    return playerSnap.exists() ? playerSnap.data().rank || "?" : "?";
+  };
+
+  const challengerRank = await getRank(ladderId, challenger);
+  const opponentRank = await getRank(ladderId, opponent);
 
   summaryEl.innerHTML = `
-    <p class="font-semibold text-lg">${challenger} (${challengerRank}) vs. ${opponent} (${opponentRank})</p>
+    <p class="font-semibold text-lg">${challengerName} (${challengerRank}) vs. ${opponentName} (${opponentRank})</p>
     <p class="text-sm text-white/70 mt-1">Date Issued: ${dateStr}</p>
   `;
 }

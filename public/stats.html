@@ -7,15 +7,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen flex flex-col bg-gradient-to-r from-blue-500 to-purple-600">
-  <div class="w-full max-w-3xl mx-auto flex-1 py-6 px-4 space-y-6">
+  <div class="w-full max-w-3xl mx-auto flex-1 py-6 px-2 space-y-6">
   <!-- Header -->
-  <div class="bg-white/10 backdrop-blur-sm px-6 py-4 flex items-center justify-between">
+  <div class="bg-white/10 backdrop-blur-sm px-2 py-4 flex items-center justify-between">
 	<h1 class="text-white text-2xl font-bold text-center mb-6">Statistics</h1>
   </div>
 
   <!-- Player Overview -->
-  <div class="px-6 py-4">
-	<div class="bg-white rounded-xl shadow-md p-6 space-y-4">
+  <div class="px-2 py-4">
+	<div class="bg-white rounded-xl shadow-md p-4 space-y-4">
 	  <div class="flex items-center space-x-4">
 		<div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
 		  <span id="player-initials" class="text-white font-bold text-xl">--</span>
@@ -38,7 +38,7 @@
   </div>
 
   <!-- Performance Overview -->
-  <div class="flex-1 px-6 pb-6">
+  <div class="flex-1 px-2 pb-6">
 	<div class="bg-white rounded-xl shadow-md h-full overflow-y-auto pb-24">
 	  <div class="p-4 border-b border-gray-100">
 		<h3 class="font-semibold text-black mb-3">Performance Overview</h3>
@@ -72,7 +72,7 @@
   </div>
 
   <!-- Bottom Navigation -->
-  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 z-50">
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 py-3 z-50">
 	<div class="flex justify-around">
 	  <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
 		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,12 +81,13 @@
 		</svg>
 		<span class="text-xs">Home</span>
 	  </a>
-	  <a href="ladder.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
-		<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-		  <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-		</svg>
-		<span class="text-xs">Ladders</span>
-	  </a>
+	  <a href="report.html" class="flex flex-col items-center text-gray-500">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+			  d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-4-6h.01M4 6h16M4 10h16M4 14h16M4 18h16" />
+      </svg>
+      <span class="text-xs">Report</span>
+    </a>
 	  <a href="challenges.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
 		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

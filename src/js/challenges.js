@@ -11,6 +11,21 @@ import { auth } from "../firebase-setup.js";
 import { onAuthStateChanged } from "firebase/auth";
 import { query, where } from "firebase/firestore";
 
+const playerNameCache = {};
+
+async function getPlayerName(uid) {
+  if (playerNameCache[uid]) return playerNameCache[uid];
+
+  const playerRef = doc(db, "players", uid);
+  const playerSnap = await getDoc(playerRef);
+  const name = playerSnap.exists()
+    ? playerSnap.data().firstName || uid
+    : uid;
+
+  playerNameCache[uid] = name;
+  return name;
+}
+
 // Toast helper for non-blocking messages
 function showToast(message, type = "success") {
   const toast = document.createElement("div");
@@ -27,22 +42,26 @@ function showToast(message, type = "success") {
 console.log("Challenges.js loaded");
 
 async function fetchChallenges(uid) {
-  const q1 = query(collection(db, "challenges"), where("challenger", "==", uid));
-  const q2 = query(collection(db, "challenges"), where("opponent", "==", uid));
-
-  const [snap1, snap2] = await Promise.all([getDocs(q1), getDocs(q2)]);
-  const allDocs = [...snap1.docs, ...snap2.docs];
-  const uniqueDocs = new Map();
-  allDocs.forEach(docSnap => {
-    if (!uniqueDocs.has(docSnap.id)) {
-      uniqueDocs.set(docSnap.id, docSnap);
-    }
-  });
+  const q = query(
+    collection(db, "challenges"),
+    where("status", "in", ["pending", "accepted", "completed"])
+  );
+  const snap = await getDocs(q);
 
   const challenges = [];
-  uniqueDocs.forEach(docSnap => {
-    challenges.push({ id: docSnap.id, ...docSnap.data() });
-  });
+  for (const docSnap of snap.docs) {
+    const data = docSnap.data();
+    if (data.challenger === uid || data.opponent === uid) {
+      const challengerName = await getPlayerName(data.challenger);
+      const opponentName = await getPlayerName(data.opponent);
+      challenges.push({
+        id: docSnap.id,
+        ...data,
+        challengerName,
+        opponentName
+      });
+    }
+  }
 
   console.log("Fetched challenges:", challenges);
   return challenges;
@@ -80,7 +99,7 @@ function renderChallenges(challenges, currentUid) {
     if (challenge.status === "pending") {
       if (challenge.opponent === currentUid) {
         html += `
-          <p class="font-bold text-lg">${challenge.challenger} vs. ${challenge.opponent}</p>
+          <p class="font-bold text-lg">${challenge.challengerName} vs. ${challenge.opponentName}</p>
           <p class="text-gray-600">Date Issued: ${formattedDate}</p>
           <div class="mt-2 flex space-x-2">
             <button onclick="handleAccept('${challenge.id}')" class="bg-green-500 text-white px-3 py-1 rounded">Accept</button>
@@ -89,7 +108,7 @@ function renderChallenges(challenges, currentUid) {
         `;
       } else {
         html += `
-          <p class="font-bold text-lg">${challenge.challenger} vs. ${challenge.opponent}</p>
+          <p class="font-bold text-lg">${challenge.challengerName} vs. ${challenge.opponentName}</p>
           <p class="text-gray-600">Date Issued: ${formattedDate}</p>
           <p class="italic text-gray-500 mt-2">Waiting for opponent to accept...</p>
         `;
@@ -98,7 +117,7 @@ function renderChallenges(challenges, currentUid) {
       feed.innerHTML += html;
     } else if (challenge.status === "accepted") {
       html += `
-        <p class="font-bold text-lg">${challenge.challenger} vs. ${challenge.opponent}</p>
+        <p class="font-bold text-lg">${challenge.challengerName} vs. ${challenge.opponentName}</p>
         <p class="text-gray-600">Date Issued: ${formattedDate}</p>
         <div class="mt-2">
           <button onclick="handleReport('${challenge.id}')" class="bg-blue-500 text-white px-3 py-1 rounded">Report Score</button>
@@ -108,8 +127,8 @@ function renderChallenges(challenges, currentUid) {
       feed.innerHTML += html;
     } else if (challenge.status === "completed") {
       const sets = challenge.score?.sets || [];
-      const player1 = challenge.challenger;
-      const player2 = challenge.opponent;
+      const player1 = challenge.challengerName;
+      const player2 = challenge.opponentName;
 
       let player1Wins = 0;
       let player2Wins = 0;

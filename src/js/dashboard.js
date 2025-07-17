@@ -26,19 +26,56 @@ export async function init() {
           joinedAny = true;
 
           const ladderDiv = document.createElement('div');
-          ladderDiv.className = 'bg-white text-gray-800 rounded-xl shadow p-4';
+          // Update className as instructed
+          ladderDiv.className = 'bg-white rounded-xl shadow p-4';
+
+          // Calculate days remaining
+          const endDateObj = new Date(ladder.endDate);
+          const today = new Date();
+          const msPerDay = 1000 * 60 * 60 * 24;
+          const daysLeft = Math.max(0, Math.ceil((endDateObj - today) / msPerDay));
 
           ladderDiv.innerHTML = `
-            <h2 class="text-lg font-bold mb-1">${ladder.name}</h2>
-            <p class="text-sm text-gray-600 mb-1">${ladder.startDate} – ${ladder.endDate}</p>
-            <div class="flex flex-col space-y-1">
-              <a href="ladder.html?ladderId=${doc.id}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                View Ladder
-              </a>
-              <a href="create-challenge.html?ladderId=${doc.id}" class="inline-block bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 transition text-sm text-center">
-                Issue Challenge
-              </a>
-            </div>
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center space-x-3">
+        <!-- Example icon, replace or adjust SVG as needed -->
+        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white text-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10l9-9m0 0l9 9m-9-9v18"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-gray-800">${ladder.name}</h2>
+          <p class="text-sm text-gray-500">${ladder.description}</p>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-between text-center text-sm text-gray-700 mb-2">
+      <div>
+        <p class="text-lg font-bold text-blue-600">#${ladder.mockRank || '–'}</p>
+        <p class="text-xs text-gray-500">Your Rank</p>
+      </div>
+      <div>
+        <p class="text-lg font-bold text-blue-600">${ladder.mockRating || '–'}</p>
+        <p class="text-xs text-gray-500">Rating</p>
+      </div>
+      <div>
+        <p class="text-lg font-bold text-blue-600">${ladder.mockRecord || '–'}</p>
+        <p class="text-xs text-gray-500">Record</p>
+      </div>
+    </div>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center text-sm text-gray-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+        </svg>
+        <span>Ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}</span>
+      </div>
+      <a href="ladder.html?ladderId=${doc.id}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+        View Ladder
+      </a>
+    </div>
           `;
           laddersList.appendChild(ladderDiv);
         }
