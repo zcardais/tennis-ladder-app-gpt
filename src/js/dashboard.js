@@ -1,6 +1,6 @@
 // Add dashboard-specific logic here
 import { db } from '../firebase-setup.js';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
 import { auth } from '../firebase-setup.js';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -12,34 +12,62 @@ export async function init() {
   async function fetchJoinedLadders(uid) {
     let ladderCount = 0;
     try {
+      // Clear existing ladder cards to avoid duplicates
+      laddersList.innerHTML = '';
       const querySnapshot = await getDocs(collection(db, 'ladders'));
       let hasLadders = false;
       let joinedAny = false;
 
-      querySnapshot.forEach((doc) => {
-        const ladder = doc.data();
+      // Loop so we can await inside for each ladder
+      for (const ladderDoc of querySnapshot.docs) {
+        const ladder = ladderDoc.data();
         const participants = ladder.participants || [];
+        if (!participants.includes(uid)) continue;
+        ladderCount++;
+        hasLadders = true;
 
-        if (participants.includes(uid)) {
-          ladderCount++;
-          hasLadders = true;
-          joinedAny = true;
+        // Fetch completed challenge docs for this ladder
+        const challengesRef = collection(db, 'challenges');
+        const challengesQuery = query(
+          challengesRef,
+          where('status', '==', 'completed'),
+          where('ladderId', '==', ladderDoc.id)
+        );
+        const challengesSnap = await getDocs(challengesQuery);
+        let wins = 0, losses = 0;
+        challengesSnap.forEach(cDoc => {
+          const data = cDoc.data();
+          const sets = data.score?.sets || [];
+          let userSetWins = 0;
+          sets.forEach(s => {
+            // if user was challenger, compare you/them; otherwise reverse
+            if (data.challenger === uid) {
+              if (s.you > s.them) userSetWins++;
+            } else {
+              if (s.them > s.you) userSetWins++;
+            }
+          });
+          const opponentSetWins = sets.length - userSetWins;
+          if (userSetWins > opponentSetWins) wins++;
+          else losses++;
+        });
+        const recordText = `${wins}–${losses}`;
 
-          const ladderDiv = document.createElement('div');
-          // Update className as instructed
-          ladderDiv.className = 'bg-white rounded-xl shadow p-4';
+        // Calculate days remaining
+        const endDateObj = new Date(ladder.endDate);
+        const today = new Date();
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const daysLeft = Math.max(0, Math.ceil((endDateObj - today) / msPerDay));
 
-          // Calculate days remaining
-          const endDateObj = new Date(ladder.endDate);
-          const today = new Date();
-          const msPerDay = 1000 * 60 * 60 * 24;
-          const daysLeft = Math.max(0, Math.ceil((endDateObj - today) / msPerDay));
-
-          ladderDiv.innerHTML = `
+        // Render the ladder card with live record
+        const ladderDiv = document.createElement('div');
+        ladderDiv.className = 'bg-white rounded-xl shadow p-4';
+        ladderDiv.innerHTML = `
     <div class="flex items-center justify-between mb-2">
       <div class="flex items-center space-x-3">
-        <!-- Example icon, replace or adjust SVG as needed -->
+        <!-- Example icon -->
         <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white text-xl">
+          <!-- SVG here -->
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10l9-9m0 0l9 9m-9-9v18"/>
           </svg>
@@ -60,7 +88,7 @@ export async function init() {
         <p class="text-xs text-gray-500">Rating</p>
       </div>
       <div>
-        <p class="text-lg font-bold text-blue-600">${ladder.mockRecord || '–'}</p>
+        <p class="text-lg font-bold text-blue-600">${recordText}</p>
         <p class="text-xs text-gray-500">Record</p>
       </div>
     </div>
@@ -72,14 +100,13 @@ export async function init() {
         </svg>
         <span>Ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}</span>
       </div>
-      <a href="ladder.html?ladderId=${doc.id}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+      <a href="ladder.html?ladderId=${ladderDoc.id}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
         View Ladder
       </a>
     </div>
-          `;
-          laddersList.appendChild(ladderDiv);
-        }
-      });
+        `;
+        laddersList.appendChild(ladderDiv);
+      }
 
       document.getElementById('stat-ladders').textContent = ladderCount;
 

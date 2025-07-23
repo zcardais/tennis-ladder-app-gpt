@@ -32,6 +32,10 @@ function loadPageScripts() {
 	  import('./js/admin-edit-ladder.js').then(module => module.init());
 	} else if (page.endsWith('players.html')) {
 	  import('./js/admin-players.js').then(module => module.init());
+	} else if (page.endsWith('add-member.html')) {
+	  import('./js/admin-add-member.js').then(module => module.init());
+	} else if (page.endsWith('edit-player.html')) {
+	  import('./js/admin-edit-player.js').then(module => module.init());
 	} else if (page.endsWith('settings.html')) {
 	  import('./js/admin-settings.js').then(module => module.init());
 	}

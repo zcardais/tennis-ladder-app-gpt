@@ -106,7 +106,8 @@ async function renderRankings(participants) {
       return;
     }
     window._ladderRankingsRendered = true;
-  const tbody = document.getElementById("rankings-body");
+  const list = document.getElementById("rankings-list");
+  list.innerHTML = "";
 
   // Compute win/loss record for each participant
   const matchesRef = collection(db, "ladders", ladderId, "matches");
@@ -121,9 +122,8 @@ async function renderRankings(participants) {
     recordMap[loserId].losses++;
   });
 
-  tbody.innerHTML = "";
   if (participants.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="text-center text-gray-500 py-4">No rankings to display yet.</td></tr>`;
+    list.innerHTML = `<li class="text-center text-gray-500 py-4">No rankings to display yet.</li>`;
     return;
   }
 
@@ -158,26 +158,39 @@ async function renderRankings(participants) {
       if (challengeId) {
         challengeCell = `<button data-id="${challengeId}" class="withdraw-btn px-3 py-1 text-sm font-medium text-white rounded bg-yellow-500 hover:bg-yellow-600">Withdraw</button>`;
       } else {
-        challengeCell = `<button data-id="${playerId}" class="issue-btn px-3 py-1 text-sm font-medium text-white rounded bg-blue-500 hover:bg-blue-600">Issue</button>`;
+        challengeCell = `
+        <button
+          data-id="${playerId}"
+          class="issue-btn px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100"
+        >
+          Challenge
+        </button>`;
       }
     }
 
-    tbody.insertAdjacentHTML("beforeend", `
-      <tr class="border-b">
-        <td class="px-4 py-3 font-medium text-gray-800">#${i + 1}</td>
-        <td class="px-4 py-3">${fullName}</td>
-        <td class="px-4 py-3 font-mono">${recordMap[playerId] ? `${recordMap[playerId].wins}–${recordMap[playerId].losses}` : '–'}</td>
-        <td class="px-4 py-3">${challengeCell}</td>
-      </tr>
-    `);
+    const li = document.createElement("li");
+    li.className = "bg-white rounded-xl p-4 flex items-center justify-between shadow";
+    li.innerHTML = `
+      <div class="flex items-center space-x-4">
+        <span class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-200 text-white font-bold">
+          ${i + 1}
+        </span>
+        <div class="flex flex-col">
+          <span class="font-medium text-gray-900">${fullName}</span>
+          <span class="text-sm text-gray-600">${recordMap[playerId] ? `${recordMap[playerId].wins}–${recordMap[playerId].losses}` : '–'}</span>
+        </div>
+      </div>
+      ${challengeCell}
+    `;
+    list.appendChild(li);
   }
 
   // Bind all challenge buttons
-  tbody.querySelectorAll(".issue-btn").forEach(btn => {
+  list.querySelectorAll(".issue-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const targetId = btn.getAttribute("data-id");
-      const targetRow = btn.closest("tr");
-      const name = targetRow.querySelector("td:nth-child(2)").textContent;
+      const targetRow = btn.closest("li");
+      const name = targetRow.querySelector("div > div > span.font-medium").textContent;
       try {
         await addDoc(collection(db, "challenges"), {
           ladderId,
@@ -194,7 +207,7 @@ async function renderRankings(participants) {
     });
   });
 
-  tbody.querySelectorAll(".withdraw-btn").forEach(btn => {
+  list.querySelectorAll(".withdraw-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const challengeId = btn.getAttribute("data-id");
       if (confirm("Withdraw this challenge?")) {

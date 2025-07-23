@@ -56,10 +56,66 @@
 		  <p class="text-blue-800 font-bold text-lg" id="win-rate">--%</p>
 		  <p class="text-blue-600 text-sm">Win Rate</p>
 		</div>
-	  </div>
+	</div>
+	
+      <!-- Ranking Progress -->
+      <div class="p-4 border-b border-gray-50">
+        <h3 class="font-semibold text-black mb-3">Ranking Progress</h3>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Starting Rank</span>
+            <span id="rank-start" class="font-semibold text-black">#0</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Current Rank</span>
+            <span id="rank-current" class="font-semibold text-black">#0</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Best Rank</span>
+            <div class="flex items-center space-x-2">
+              <span id="rank-best" class="font-semibold text-black">#0</span>
+              <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L10 4.414 6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Net Movement</span>
+            <div class="flex items-center space-x-1">
+              <span id="rank-net" class="font-semibold text-green-600">+0</span>
+              <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L10 4.414 6.707 7.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+	  <!-- Challenge Activity -->
+  <div class="p-4 border-b border-gray-50">
+    <h3 class="font-semibold text-black mb-3">Challenge Activity</h3>
+    <div class="space-y-3">
+      <div class="flex items-center justify-between">
+        <span class="text-gray-600">Challenges Sent</span>
+        <span id="ch-sent" class="font-semibold text-black">0</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-gray-600">Challenges Received</span>
+        <span id="ch-received" class="font-semibold text-black">0</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-gray-600">Success Rate (Sent)</span>
+        <span id="ch-success" class="font-semibold text-black">0%</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-gray-600">Defense Rate</span>
+        <span id="ch-defense" class="font-semibold text-black">0%</span>
+      </div>
+    </div>
+  </div>
 
 	  <!-- Recent Matches -->
-	  <div class="p-4">
+	   <div class="p-4">
 		<h3 class="font-semibold text-black mb-3">Recent Matches</h3>
 		<div id="recent-matches" class="space-y-4">
 		  <div class="bg-white rounded-xl shadow-sm p-4 flex justify-between items-center">
@@ -68,7 +124,6 @@
 		</div>
 	  </div>
 	</div>
-  </div>
   </div>
 
   <!-- Bottom Navigation -->

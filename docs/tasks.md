@@ -14,6 +14,8 @@
   - [x] Issue Challenge
 - [x] Ladder buttons pass correct `ladderId` via URL
 
+- [x] Fetch and display actual W–L records in each dashboard ladder card (replace mockRecord)
+
 ---
 
 ## 📈 Ladder Page (`ladder.html`)
@@ -56,3 +58,11 @@
 - [x] Add loading states or spinners
 - [ ] Improve record (W–L) rendering in player cards
 - [ ] Add page for viewing all my active challenges
+- [ ] Polish stats.html page to match mockup
+  - [ ] stats page URL needs to grab player ID or user UID
+
+- [ ] Hook up real match-data charts on stats.html and verify mobile responsiveness
+- [ ] Replace remaining alert() calls with toast notifications and add loading spinners for all data loads
+- [ ] Review Firestore security rules to ensure ladders, matches, and challenges are scoped to each user’s UID
+- [ ] Perform end-to-end responsiveness QA on phone and tablet breakpoints
+- [ ] Decide whether or not to keep matches.html and matches.js. They may be redundant given that we're pulling W-L record and stats.html data from the challenges collection
