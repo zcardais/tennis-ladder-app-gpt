@@ -15,10 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const addForm = document.getElementById("add-player-form");
   const addInput = document.getElementById("add-player-input");
   
-  const firstNameInput = document.getElementById("add-player-firstname");
-  const lastNameInput = document.getElementById("add-player-lastname");
-  const nameRegex = /^[A-Za-z\s\-]+$/;
-  
   // Status message helpers
   function clearStatus() {
     if (!statusMessage) return;
@@ -165,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
   
-  addForm.addEventListener("submit", async (e) => {
+  addForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearStatus();
     
@@ -179,22 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (!firstName && !lastName) {
       showError("Please enter at least a first or last name.");
-      return;
-    }
-    if (firstName && !firstNameInput.checkValidity()) {
-      showError(firstNameInput.title);
-      return;
-    }
-    if (lastName && !lastNameInput.checkValidity()) {
-      showError(lastNameInput.title);
-      return;
-    }
-    if (firstName && !nameRegex.test(firstName)) {
-      showError("First name can only contain letters, spaces, and hyphens.");
-      return;
-    }
-    if (lastName && !nameRegex.test(lastName)) {
-      showError("Last name can only contain letters, spaces, and hyphens.");
       return;
     }
     
@@ -244,5 +224,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const openAddBtn = document.getElementById("openAddMember");
   openAddBtn?.addEventListener("click", () => {
     window.location.href = "add-member.html";
+  });
+
+  // Navigate to Edit Player page when Edit button clicked
+  participantsList?.addEventListener("click", e => {
+    const editBtn = e.target.closest(".btn-edit");
+    if (editBtn) {
+      const userId = editBtn.dataset.userId;
+      window.location.href = `edit-player.html?playerId=${userId}`;
+    }
   });
 });

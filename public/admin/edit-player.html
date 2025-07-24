@@ -1,0 +1,115 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Player</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-indigo-500 to-purple-600 min-h-screen text-white pb-20">
+  <div class="max-w-md sm:max-w-lg lg:max-w-2xl mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
+    <a href="players.html" class="text-white underline">&larr; Back to Club Roster</a>
+    <h1 class="text-3xl font-bold mt-4 mb-2">Edit Player</h1>
+    <div id="status-message" class="hidden text-green-200 bg-green-700 rounded p-2 mb-4 text-sm font-medium"></div>
+    <div class="bg-white text-gray-800 rounded-xl shadow-lg p-4">
+      <form id="edit-player-form" class="space-y-4" novalidate>
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+          <input
+            id="firstName"
+            name="firstName"
+            type="text"
+            required
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+          <input
+            id="lastName"
+            name="lastName"
+            type="text"
+            required
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Phone Number</label>
+          <input
+            id="phoneNumber"
+            name="phoneNumber"
+            type="tel"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          />
+        </div>
+        <div>
+          <label for="utr" class="block text-sm font-medium text-gray-700">UTR</label>
+          <input
+            id="utr"
+            name="utr"
+            type="number"
+            step="0.1"
+            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          />
+        </div>
+        <!-- Quick Add to Ladders -->
+        <fieldset class="space-y-2">
+          <legend class="text-base font-medium text-gray-700">Add to Ladders</legend>
+          <div id="laddersCheckboxes" class="flex flex-col space-y-2">
+            <!-- JS will inject checkbox labels for each active ladder here -->
+          </div>
+        </fieldset>
+        <div class="flex justify-end space-x-2">
+          <button
+            type="button"
+            id="cancelBtn"
+            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          >
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Bottom Navigation -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 z-50">
+    <div class="flex justify-around">
+      <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
+        <!-- dashboard icon SVG -->
+      </a>
+      <a href="ladders.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
+        <!-- ladders icon SVG -->
+      </a>
+      <a href="matches.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
+        <!-- matches icon SVG -->
+      </a>
+      <a href="players.html" class="flex flex-col items-center space-y-1 text-blue-600 transition">
+        <!-- players icon SVG -->
+        <span class="text-xs font-medium">Players</span>
+      </a>
+      <a href="settings.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
+        <!-- settings icon SVG -->
+      </a>
+    </div>
+  </div>
+  <script type="module" src="/src/js/admin-edit-player.js"></script>
+</body>
+</html>
