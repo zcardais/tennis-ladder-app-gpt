@@ -1,5 +1,3 @@
-
-
 import { db } from '../firebase-setup.js';
 import {
   doc,
@@ -112,6 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const shouldBeMember = selected.includes(ladderId);
         if (!isMember && shouldBeMember) {
           await updateDoc(ladderRef, { participants: arrayUnion(playerId) });
+          await updateDoc(playerRef, { status: "active" });
         } else if (isMember && !shouldBeMember) {
           await updateDoc(ladderRef, { participants: arrayRemove(playerId) });
         }

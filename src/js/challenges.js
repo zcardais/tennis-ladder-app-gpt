@@ -6,7 +6,7 @@ import {
   updateDoc,
   serverTimestamp
 } from "firebase/firestore";
-import { db } from "../firebase-setup.js";
+import { db, getCurrentUID } from "../firebase-setup.js";
 import { auth } from "../firebase-setup.js";
 import { onAuthStateChanged } from "firebase/auth";
 import { query, where } from "firebase/firestore";
@@ -213,10 +213,11 @@ export function init() {
       return;
     }
 
-    console.log("Challenges init for user:", user.uid);
+    const uid = getCurrentUID();
+    console.log("Challenges init for user:", uid);
     try {
-      const challenges = await fetchChallenges(user.uid);
-      renderChallenges(challenges, user.uid);
+      const challenges = await fetchChallenges(uid);
+      renderChallenges(challenges, uid);
     } catch (err) {
       console.error("🔥 Error initializing challenges:", err);
     }

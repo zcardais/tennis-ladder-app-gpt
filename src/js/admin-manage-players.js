@@ -6,8 +6,9 @@ import {
   where,
   updateDoc,
   setDoc,
+  serverTimestamp,
 } from "firebase/firestore";
-import { db } from "../firebase-setup.js";
+import { db, getCurrentUID } from "../firebase-setup.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   
@@ -191,13 +192,20 @@ document.addEventListener("DOMContentLoaded", () => {
       let userId;
       
       if (snap.empty) {
-        // Create new player doc with email, firstName, lastName
+        // Create new player doc with standardized schema
         const newPlayerRef = doc(playersRef);
         await setDoc(newPlayerRef, {
+          uid: getCurrentUID(),
           email,
           firstName,
           lastName,
-          rank: 0
+          username: "",
+          phoneNumber: "",
+          ladderId: "",
+          utr: null,
+          rank: 0,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
         });
         userId = newPlayerRef.id;
       } else {

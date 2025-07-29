@@ -24,3 +24,9 @@ const auth = getAuth(app);
 // ✅ Export app so other modules can use it
 export { app, db, auth };
 export { firebaseConfig };
+
+// Utility: Get current user's UID
+export function getCurrentUID() {
+  const user = auth.currentUser;
+  return user ? user.uid : null;
+}

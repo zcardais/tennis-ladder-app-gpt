@@ -1,5 +1,5 @@
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
-import { db, auth } from "../firebase-setup.js";
+import { db, auth, getCurrentUID } from "../firebase-setup.js";
 import { onAuthStateChanged } from "firebase/auth";
 
 console.log("Stats.js loaded");
@@ -204,6 +204,7 @@ export function init() {
       window.location.href = "/auth.html";
       return;
     }
-    await loadPlayerStats(user.uid);
+    const uid = getCurrentUID();
+    await loadPlayerStats(uid);
   });
 }

@@ -45,10 +45,19 @@
 	  </div>
 	</div>
 
+	<!-- Recent Matches -->
+	<div class="px-2 pb-4">
+	  <h2 class="text-xl font-semibold text-white mb-4">Recent Matches</h2>
+	  <div id="recent-matches" class="space-y-2">
+	    <p class="text-sm text-white/70">Loading recent matches...</p>
+	  </div>
+	  <button class="mt-4 w-full bg-white text-indigo-600 font-semibold py-2 rounded hover:bg-indigo-100">View All Matches</button>
+	</div>
+
 	<!-- Quick Actions -->
 	<div class="px-2 pb-24 space-y-3">
 	  <a href="challenges.html#accepted" class="block w-full bg-indigo-600 text-white text-center py-3 rounded-xl font-semibold shadow">Report a Score</a>
-	  <div id="admin-panel-button" class="hidden">
+	  <div id="admin-panel-button" class="admin-only hidden">
 	    <a href="admin/index.html" class="block w-full bg-red-600 text-white text-center py-3 rounded-xl font-semibold shadow">Admin Panel</a>
 	  </div>
 	</div>
@@ -106,13 +115,7 @@
   <!-- Ladder Script -->
   <script type="module" src="/src/js/dashboard.js"></script>
   <script type="module" src="/src/main.js"></script>
-  <script>
-    // Simulate admin check - update logic when auth is added
-    const isAdmin = localStorage.getItem("isAdmin") === "true";
-    if (isAdmin) {
-      document.getElementById("admin-panel-button").classList.remove("hidden");
-    }
-  </script>
+  
   <script type="module" src="/src/js/logout.js"></script>
 </body>
 </html>

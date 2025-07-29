@@ -1,5 +1,5 @@
 import { doc, getDoc, updateDoc, serverTimestamp, collection, addDoc, query, where, getDocs } from "firebase/firestore";
-import { db } from "../firebase-setup.js";
+import { db, getCurrentUID } from "../firebase-setup.js";
 
 // Toast helper for non-blocking messages
 function showToast(message, duration = 3000) {
@@ -154,6 +154,7 @@ reportForm.addEventListener("submit", async (e) => {
     // ✅ Create new match document
     const matchesRef = collection(db, "matches");
     await addDoc(matchesRef, {
+      uid: getCurrentUID(),
       players: [challengeData.challenger, challengeData.opponent],
       winner: winnerId,
       loser: loserId,

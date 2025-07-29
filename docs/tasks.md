@@ -1,4 +1,74 @@
-# ✅ Tennis Ladder App – QA + Wiring Checklist
+# ✅ Tennis Ladder App – Updated Task List (July 2025)
+
+---
+
+- [x] Link current user to `auth.currentUser.uid` throughout app
+- [ ] Auto-send ladder rules to player upon being added to ladder
+- [ ] Create “Resend Invite” button in Admin tools
+- [ ] Add final Firestore security rules before release
+- [ ] Confirm challenge flow works across 2+ real accounts
+- [ ] Implement “Forgot Password” recovery screen
+- [ ] Test on iPad and desktop screen widths
+
+- [ ] Add "Recent Matches" module to Dashboard (show last 3–5 matches, link to full match history)
+
+---
+
+## ⚙️ Medium Priority
+- [ ] Improve W–L display in player cards (styled badge or “3–2” shorthand)
+- [ ] Add challenge expiration countdown or status indicator
+- [ ] Wildcard challenge system (admin config per ladder)
+- [ ] Challenge acceptance window with auto-decline after X days
+- [ ] Configurable ladder open and close dates
+- [ ] Inactivity penalty system (e.g., drop X spots after Y days)
+- [ ] Finalize admin rule config UI for:
+  - challenge range
+  - forfeit window
+  - challenge-down toggle
+- [ ] Add team color to ladder cards (optional field)
+- [ ] Auto-scroll to top of dashboard after login redirect
+
+- [ ] Define ranking logic for new players joining a ladder (default, manual, or dynamic)
+
+---
+
+## 🎨 Low Priority
+- [ ] Add visual spacing or dividers between sections on dashboard
+- [ ] Add “My Active Challenges” tab (sent and received)
+- [ ] Add favicon and app title to match brand
+- [ ] Convert toast logic to a reusable module
+- [ ] Polish loading states on slower network
+- [ ] Admin dashboard with ladder health stats (active %, pending challenges, stale matches)
+- [ ] Admin impersonation or “view as player” mode for support/debug
+
+## Cleanup Tasks
+- [ ] Confirm if `matches.html` and `matches.js` are still needed
+- [ ] Remove all `mockRecord` references
+- [ ] Review and optionally archive `seed-test-data.cjs` and `reset-test-data.cjs`
+- [ ] Review `test-firestore.js` and remove or archive if redundant
+- [ ] Delete unused `/js/` folder in root (keep `/src/js/`)
+- [ ] Delete `index.html` if it only redirects to `dashboard.html`. Get help from chatGPT to verify `firebase.json` or `vite.config.mjs` to make sure routing still works post-deletion.
+
+## Phase II
+- [ ] Support doubles ladder structure (team creation, pairing logic) *(phase 2 – plan schema now)*
+
+---
+
+## ✅ Completed
+- [x] Integrate real user authentication (Firebase Auth)
+- [x] Prevent duplicate open challenges between players
+- [x] Add toast notifications on challenge/report
+- [x] Simulated login and consistent test accounts
+- [x] Match lifecycle (issue → accept → report)
+- [x] Admin: Create/Edit ladders + manage players
+- [x] Ladder rankings + bump logic
+- [x] Responsive layout + mobile-first design
+
+- [x] Link current user to `auth.currentUser.uid` throughout app
+
+--- --- --- --- --- ---
+
+# ✅ Tennis Ladder App – QA + Wiring Checklist (June 2025)
 
 ## 🔁 General App Flow
 - [ ] Use consistent `loggedInPlayerId` (simulate login)
@@ -66,55 +136,3 @@
 - [ ] Review Firestore security rules to ensure ladders, matches, and challenges are scoped to each user’s UID
 - [ ] Perform end-to-end responsiveness QA on phone and tablet breakpoints
 - [ ] Decide whether or not to keep matches.html and matches.js. They may be redundant given that we're pulling W-L record and stats.html data from the challenges collection
-# ✅ Tennis Ladder App – Updated Task List (July 2025)
-
----
-
-## 🔥 High Priority
-- [ ] Integrate real user authentication (Firebase Auth)
-- [ ] Link current user to `auth.currentUser.uid` throughout app
-- [ ] Auto-send ladder rules to player upon being added to ladder
-- [ ] Create “Resend Invite” button in Admin tools
-- [ ] Support doubles ladder structure (team creation, pairing logic) *(phase 2 – plan schema now)*
-- [ ] Add final Firestore security rules before release
-- [ ] Confirm challenge flow works across 2+ real accounts
-- [ ] Implement “Forgot Password” recovery screen
-- [ ] Test on iPad and desktop screen widths
-
----
-
-## ⚙️ Medium Priority
-- [ ] Improve W–L display in player cards (styled badge or “3–2” shorthand)
-- [ ] Add challenge expiration countdown or status indicator
-- [ ] Wildcard challenge system (admin config per ladder)
-- [ ] Challenge acceptance window with auto-decline after X days
-- [ ] Configurable ladder open and close dates
-- [ ] Inactivity penalty system (e.g., drop X spots after Y days)
-- [ ] Finalize admin rule config UI for:
-  - challenge range
-  - forfeit window
-  - challenge-down toggle
-- [ ] Add team color to ladder cards (optional field)
-- [ ] Auto-scroll to top of dashboard after login redirect
-
----
-
-## 🎨 Low Priority
-- [ ] Add visual spacing or dividers between sections on dashboard
-- [ ] Add “My Active Challenges” tab (sent and received)
-- [ ] Add favicon and app title to match brand
-- [ ] Convert toast logic to a reusable module
-- [ ] Polish loading states on slower network
-- [ ] Admin dashboard with ladder health stats (active %, pending challenges, stale matches)
-- [ ] Admin impersonation or “view as player” mode for support/debug
-
----
-
-## ✅ Completed
-- [x] Prevent duplicate open challenges between players
-- [x] Add toast notifications on challenge/report
-- [x] Simulated login and consistent test accounts
-- [x] Match lifecycle (issue → accept → report)
-- [x] Admin: Create/Edit ladders + manage players
-- [x] Ladder rankings + bump logic
-- [x] Responsive layout + mobile-first design

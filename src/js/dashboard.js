@@ -1,6 +1,6 @@
 // Add dashboard-specific logic here
-import { db } from '../firebase-setup.js';
-import { collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
+import { db, getCurrentUID } from '../firebase-setup.js';
+import { collection, getDocs, doc, getDoc, query, where, addDoc, serverTimestamp } from 'firebase/firestore';
 import { auth } from '../firebase-setup.js';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -129,6 +129,56 @@ export async function init() {
     }
   }
 
+  async function fetchRecentMatches(uid) {
+    const matchesList = document.getElementById("recent-matches");
+    matchesList.innerHTML = ""; // clear loading state
+
+    try {
+      const matchesRef = collection(db, "matches");
+      const matchesQuery = query(
+        matchesRef,
+        where("players", "array-contains", uid),
+        where("datePlayed", "!=", null),
+        // Firestore doesn't support orderBy after array-contains without an index, but assume the index is created
+      );
+      const snapshot = await getDocs(matchesQuery);
+
+      // Sort locally by datePlayed desc and take top 5
+      const recentMatches = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .filter(m => m.datePlayed)
+        .sort((a, b) => b.datePlayed.toMillis() - a.datePlayed.toMillis())
+        .slice(0, 5);
+
+      if (recentMatches.length === 0) {
+        matchesList.innerHTML = '<p class="text-sm text-white/70">No recent matches found.</p>';
+        return;
+      }
+
+      for (const match of recentMatches) {
+        const opponentId = match.players.find(p => p !== uid);
+        const result = match.winner === uid ? "Won" : "Lost";
+        const score = match.score?.sets?.map(s => `${s.you}–${s.them}`).join(', ') || "Score N/A";
+        const date = match.datePlayed.toDate().toLocaleDateString();
+
+        const matchCard = document.createElement("div");
+        matchCard.className = "bg-white rounded p-3 shadow text-sm";
+        matchCard.innerHTML = `
+          <div class="flex justify-between mb-1">
+            <span class="font-medium text-gray-800">${result}</span>
+            <span class="text-gray-500">${date}</span>
+          </div>
+          <div class="text-gray-700">vs ${opponentId}</div>
+          <div class="text-xs text-gray-500">${score}</div>
+        `;
+        matchesList.appendChild(matchCard);
+      }
+    } catch (error) {
+      console.error("Error loading recent matches:", error);
+      matchesList.innerHTML = '<p class="text-sm text-red-400">Failed to load matches.</p>';
+    }
+  }
+
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       window.location.href = '/auth.html';
@@ -136,13 +186,40 @@ export async function init() {
     }
 
     const uid = user.uid;
-    const playerRef = doc(db, 'players', uid);
-    const playerSnap = await getDoc(playerRef);
-    if (playerSnap.exists()) {
-      const player = playerSnap.data();
-      const displayName = `${player.firstName} ${player.lastName}`;
-      document.getElementById('user-name').textContent = displayName;
-      fetchJoinedLadders(uid);
+    const playersQuery = query(collection(db, 'players'), where('uid', '==', uid));
+    const playersSnap = await getDocs(playersQuery);
+
+    let player;
+    if (!playersSnap.empty) {
+      player = playersSnap.docs[0].data();
+    } else {
+      // Auto-create player profile
+      const playerData = {
+        uid,
+        email: user.email,
+        firstName: "",
+        lastName: "",
+        username: "",
+        rank: 0,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+      await addDoc(collection(db, 'players'), playerData);
+      player = playerData;
+      console.log(`✅ Auto-created player profile for ${user.email}`);
     }
+
+    const displayName = `${player.firstName} ${player.lastName}`.trim() || player.username || "Player";
+    document.getElementById('user-name').textContent = displayName;
+
+    // Reveal admin-only elements if player is admin
+    if (player.isAdmin) {
+      document.querySelectorAll('.admin-only').forEach(el => {
+        el.classList.remove('hidden');
+      });
+    }
+
+    fetchJoinedLadders(uid);
+    fetchRecentMatches(uid);
   });
 }

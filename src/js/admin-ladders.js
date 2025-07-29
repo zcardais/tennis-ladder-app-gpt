@@ -27,11 +27,39 @@ export function renderPlayerList(players) {
   });
 }
 
-// File: public/admin/players.html
-<thead>
-  <tr>
-    <th class="p-2 text-left">Rank</th>
-    <th class="p-2 text-left">Player</th>
-    <th class="p-2 text-left">Record</th>
-  </tr>
-</thead>
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase-setup.js";
+
+export async function init() {
+  console.log("admin-ladders.js initialized");
+
+  const container = document.getElementById("admin-ladders-list");
+  if (!container) return;
+
+  container.innerHTML = "<p class='text-gray-500 text-sm'>Loading ladders...</p>";
+
+  try {
+    const snapshot = await getDocs(collection(db, "ladders"));
+    container.innerHTML = "";
+
+    if (snapshot.empty) {
+      container.innerHTML = "<p class='text-gray-500 text-sm'>No ladders found.</p>";
+      return;
+    }
+
+    snapshot.forEach(doc => {
+      const ladder = doc.data();
+      const card = document.createElement("div");
+      card.className = "bg-white p-4 rounded shadow mb-4";
+      card.innerHTML = `
+        <h3 class="text-lg font-semibold mb-1">${ladder.name || "Unnamed Ladder"}</h3>
+        <p class="text-sm text-gray-600 mb-2">${ladder.description || "No description provided."}</p>
+        <a href="/admin/edit-ladder.html?ladderId=${doc.id}" class="text-blue-600 hover:underline text-sm">Manage Ladder</a>
+      `;
+      container.appendChild(card);
+    });
+  } catch (err) {
+    console.error("Failed to load ladders:", err);
+    container.innerHTML = "<p class='text-red-600'>Failed to load ladders.</p>";
+  }
+}

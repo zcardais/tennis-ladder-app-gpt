@@ -1,6 +1,6 @@
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { db } from "../firebase-setup.js";
+import { db, getCurrentUID } from "../firebase-setup.js";
 console.log("✅ DB Loaded:", db);
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -118,6 +118,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       await addDoc(collection(db, "challenges"), {
+        uid: getCurrentUID(),
         ladderId,
         challenger,
         opponent: selectedOpponent,
