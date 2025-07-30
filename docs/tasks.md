@@ -10,7 +10,8 @@
 - [ ] Implement “Forgot Password” recovery screen
 - [ ] Test on iPad and desktop screen widths
 
-- [ ] Add "Recent Matches" module to Dashboard (show last 3–5 matches, link to full match history)
+- [x] Add "Recent Matches" module to Dashboard (show last 3–5 matches, link to full match history)
+- [ ] Wire up view all matches button on dashboard.html
 
 ---
 
