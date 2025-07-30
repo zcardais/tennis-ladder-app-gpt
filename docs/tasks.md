@@ -11,7 +11,9 @@
 - [ ] Test on iPad and desktop screen widths
 
 - [x] Add "Recent Matches" module to Dashboard (show last 3–5 matches, link to full match history)
-- [ ] Wire up view all matches button on dashboard.html
+- [ ] Wire up View All Matches button on dashboard.html
+- [ ] Wire up profile.html os that it shows my profile information using uid
+- [ ] Wire up all user pages to show user-specific data e.g. stats, profile, ladders…
 
 ---
 

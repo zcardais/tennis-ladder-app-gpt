@@ -5,16 +5,14 @@ import { onAuthStateChanged } from "firebase/auth";
 console.log("Stats.js loaded");
 
 async function loadPlayerStats(userId) {
-  // Fetch player info
-  const playerRef = doc(db, "players", userId);
-  const playerSnap = await getDoc(playerRef);
-
-  if (!playerSnap.exists()) {
+  // Fetch player info by querying for uid
+  const playerQuery = query(collection(db, "players"), where("uid", "==", userId));
+  const playerSnap = await getDocs(playerQuery);
+  if (playerSnap.empty) {
     console.error("Player not found!");
     return;
   }
-
-  const playerData = playerSnap.data();
+  const playerData = playerSnap.docs[0].data();
   // Derive full name from firstName and lastName
   const fullName = `${playerData.firstName} ${playerData.lastName}`;
   document.getElementById("player-name").innerText = fullName;
@@ -192,6 +190,131 @@ async function loadPlayerStats(userId) {
         </div>`;
     }
   }
+
+  await renderMatchHistory(userId, recentMatches);
+}
+
+async function renderMatchHistory(userId, recentMatches) {
+  // === Match History Section (grouped by ladder) ===
+  const historyContainer = document.querySelector("#section-history .space-y-6");
+  if (historyContainer) {
+    historyContainer.innerHTML = ""; // clear default
+
+    // Group matches by ladderId
+    const ladderGroups = {};
+    const ladderNames = new Set();
+    for (const match of recentMatches) {
+      const lid = match.ladderId || "unknown";
+      if (!ladderGroups[lid]) ladderGroups[lid] = [];
+      ladderGroups[lid].push(match);
+    }
+
+    for (const [ladderId, matches] of Object.entries(ladderGroups)) {
+      let ladderName = "Unknown Ladder";
+      let ladderStatus = "Finished";
+      try {
+        const ladderSnap = await getDoc(doc(db, "ladders", ladderId));
+        if (ladderSnap.exists()) {
+          const ladderData = ladderSnap.data();
+          ladderName = ladderData.name || "Unnamed Ladder";
+          ladderStatus = ladderData.active ? "Active" : "Finished";
+        }
+      } catch {}
+
+      ladderNames.add(ladderName);
+
+      const section = document.createElement("div");
+      section.dataset.ladder = ladderId;
+      section.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <h4 class="text-sm font-semibold text-black">${ladderName}</h4>
+          <span class="text-xs px-2 py-0.5 rounded-full ${ladderStatus === "Active" ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"}">${ladderStatus}</span>
+        </div>
+      `;
+
+      matches.forEach(async match => {
+        const sets = match.score?.sets || [];
+        const opponentId = match.challenger === userId ? match.opponent : match.challenger;
+        let opponentName = opponentId;
+        try {
+          const oppSnap = await getDoc(doc(db, "players", opponentId));
+          if (oppSnap.exists()) {
+            const pd = oppSnap.data();
+            opponentName = `${pd.firstName} ${pd.lastName}`;
+          }
+        } catch {}
+
+        const initials = opponentName.split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase();
+
+        const scoreText = sets
+          .map(s => match.challenger === userId ? `${s.you}-${s.them}` : `${s.them}-${s.you}`)
+          .join(", ");
+
+        const userSetWins = sets.filter(s => (match.challenger === userId ? s.you > s.them : s.them > s.you)).length;
+        const isWin = userSetWins > sets.length - userSetWins;
+        const resultLabel = isWin ? "Won" : "Lost";
+
+        let dateText = "";
+        if (match.completedAt) {
+          const dt = match.completedAt.toDate ? match.completedAt.toDate() : new Date(match.completedAt);
+          const diffDays = Math.floor((Date.now() - dt.getTime()) / (1000 * 60 * 60 * 24));
+          dateText = diffDays === 0 ? "Today" : diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
+        }
+
+        const card = document.createElement("div");
+        card.className = `rounded-lg p-3 space-y-1 ${isWin ? "bg-green-50" : "bg-red-50"}`;
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 bg-blue-300 text-white font-bold rounded-full flex items-center justify-center">${initials}</div>
+              <div>
+                <p class="text-sm font-semibold text-black">vs ${opponentName}</p>
+                <p class="text-xs text-gray-600">${dateText} • Rank #-- → #--</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-semibold text-${isWin ? "green" : "red"}-600 text-sm">${resultLabel}</p>
+              <p class="text-xs text-gray-600">${scoreText}</p>
+            </div>
+          </div>
+        `;
+        section.appendChild(card);
+      });
+
+      historyContainer.appendChild(section);
+    }
+
+    const ladderFilters = document.getElementById("ladder-filters");
+    if (ladderFilters) {
+      const names = ["All Ladders", ...ladderNames];
+      ladderFilters.innerHTML = "";
+      names.forEach(name => {
+        const btn = document.createElement("button");
+        btn.textContent = name;
+        btn.className = `px-3 py-1 text-sm font-medium rounded-full ${name === "All Ladders" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`;
+        btn.addEventListener("click", () => {
+          // Visual highlight
+          [...ladderFilters.children].forEach(b => {
+            b.classList.remove("bg-blue-600", "text-white");
+            b.classList.add("bg-gray-200", "text-gray-700");
+          });
+          btn.classList.add("bg-blue-600", "text-white");
+          btn.classList.remove("bg-gray-200", "text-gray-700");
+
+          const allSections = document.querySelectorAll("#section-history [data-ladder]");
+          allSections.forEach(section => {
+            const header = section.querySelector("h4")?.textContent || "";
+            if (name === "All Ladders" || header.includes(name)) {
+              section.classList.remove("hidden");
+            } else {
+              section.classList.add("hidden");
+            }
+          });
+        });
+        ladderFilters.appendChild(btn);
+      });
+    }
+  }
 }
 
 /**
@@ -206,5 +329,70 @@ export function init() {
     }
     const uid = getCurrentUID();
     await loadPlayerStats(uid);
+
+    // Tab switching logic
+    const tabOverview = document.getElementById("tab-overview");
+    const tabHistory = document.getElementById("tab-history");
+    const sectionOverview = document.getElementById("section-overview");
+    const sectionHistory = document.getElementById("section-history");
+
+    if (tabOverview && tabHistory && sectionOverview && sectionHistory) {
+      tabOverview.addEventListener("click", () => {
+        sectionOverview.classList.remove("hidden");
+        sectionHistory.classList.add("hidden");
+        tabOverview.classList.add("bg-white", "text-black");
+        tabOverview.classList.remove("bg-gray-100", "text-gray-500");
+        tabHistory.classList.remove("bg-white", "text-black");
+        tabHistory.classList.add("bg-gray-100", "text-gray-500");
+      });
+
+      tabHistory.addEventListener("click", () => {
+        sectionOverview.classList.add("hidden");
+        sectionHistory.classList.remove("hidden");
+        tabOverview.classList.remove("bg-white", "text-black");
+        tabOverview.classList.add("bg-gray-100", "text-gray-500");
+        tabHistory.classList.add("bg-white", "text-black");
+        tabHistory.classList.remove("bg-gray-100", "text-gray-500");
+      });
+
+      // Auto-switch to history tab if hash is #history
+      if (window.location.hash === "#history") {
+        tabHistory.click();
+      }
+
+      // Ladder filter buttons logic
+      const filterButtons = document.querySelectorAll("#ladder-filters button");
+      filterButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          // Visual highlight
+          filterButtons.forEach(b => {
+            b.classList.remove("bg-blue-600", "text-white");
+            b.classList.add("bg-gray-200", "text-gray-700");
+          });
+          button.classList.add("bg-blue-600", "text-white");
+          button.classList.remove("bg-gray-200", "text-gray-700");
+
+          const selected = button.textContent.trim();
+          const allSections = document.querySelectorAll("#section-history [data-ladder]");
+
+          allSections.forEach(section => {
+            const header = section.querySelector("h4")?.textContent || "";
+            if (selected === "All Ladders" || header.includes(selected)) {
+              section.classList.remove("hidden");
+            } else {
+              section.classList.add("hidden");
+            }
+          });
+        });
+      });
+    }
+
+    // Scroll to ladder filter bar when Filter button is clicked
+    const filterButton = document.querySelector("#section-history button");
+    if (filterButton) {
+      filterButton.addEventListener("click", () => {
+        document.getElementById("ladder-filters")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
   });
-}
+  }
