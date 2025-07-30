@@ -75,16 +75,6 @@ async function loadLadder() {
 	  const yourRankEl = document.getElementById("your-rank");
 	  if (yourRankEl) yourRankEl.textContent = rankIdx >= 0 ? `${rankIdx + 1}` : "–";
 
-	  const playerRef = doc(db, "players", loggedInPlayerId);
-	  const playerSnap = await getDoc(playerRef);
-	  if (playerSnap.exists()) {
-		const p = playerSnap.data();
-		const nameEl = document.getElementById("your-name");
-		const ratingEl = document.getElementById("your-rating");
-		if (nameEl) nameEl.textContent = `${p.firstName || ""} ${p.lastName || ""}`.trim();
-		if (ratingEl) ratingEl.textContent = `${p.rating || "–"}`;
-	  }
-
 	  let participants = [...new Set(data.participants || [])];
 	  console.log("🎯 Final deduplicated participants:", participants);
 	  renderRankings(participants);
@@ -122,6 +112,33 @@ async function renderRankings(participants) {
     recordMap[loserId].losses++;
   });
 
+  // 🧩 Update player info card at top of page
+  const playerDocSnap = await getDocs(query(collection(db, "players"), where("uid", "==", auth.currentUser.uid)));
+  if (playerDocSnap.empty) return;
+
+  const playerDoc = playerDocSnap.docs[0];
+  const playerId = playerDoc.id;
+  const playerData = playerDoc.data();
+  const playerRankIndex = participants.indexOf(playerId);
+
+  if (playerData) {
+    const p = playerData;
+    const fullName = `${p.firstName || ""} ${p.lastName || ""}`.trim();
+
+    const initialsEl = document.getElementById("player-initials");
+    const nameEl = document.getElementById("player-name");
+    const rankEl = document.getElementById("player-rank");
+    const recordEl = document.getElementById("player-record");
+
+    if (initialsEl) initialsEl.textContent = fullName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+    if (nameEl) nameEl.textContent = fullName;
+    if (rankEl) rankEl.textContent = playerRankIndex >= 0 ? `#${playerRankIndex + 1}` : "–";
+
+    const wins = recordMap[playerId]?.wins || 0;
+    const losses = recordMap[playerId]?.losses || 0;
+    if (recordEl) recordEl.textContent = `${wins}–${losses}`;
+  }
+
   if (participants.length === 0) {
     list.innerHTML = `<li class="text-center text-gray-500 py-4">No rankings to display yet.</li>`;
     return;
@@ -151,7 +168,7 @@ async function renderRankings(participants) {
       fullName = `${playerData.firstName || ""} ${playerData.lastName || ""}`.trim();
     }
 
-    const isSelf = playerId === loggedInPlayerId;
+    const isSelf = playerId === playerDoc.id;
     let challengeCell = "";
     if (!isSelf) {
       const challengeId = activeChallengeMap[playerId];
@@ -200,6 +217,10 @@ async function renderRankings(participants) {
           dateIssued: new Date()
         });
         alert(`Challenge sent to ${name}!`);
+        btn.textContent = "Waiting for response...";
+        btn.disabled = true;
+        btn.classList.remove("bg-blue-50", "text-blue-600", "hover:bg-blue-100");
+        btn.classList.add("bg-gray-200", "text-gray-500", "cursor-not-allowed");
       } catch (err) {
         console.error("Error issuing challenge:", err);
         alert("Failed to issue challenge. Please try again.");
