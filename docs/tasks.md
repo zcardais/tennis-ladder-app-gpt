@@ -14,6 +14,7 @@
 - [ ] Wire up View All Matches button on dashboard.html
 - [ ] Wire up profile.html os that it shows my profile information using uid
 - [ ] Wire up all user pages to show user-specific data e.g. stats, profile, ladders…
+- [ ] 
 
 ---
 

@@ -1,5 +1,5 @@
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
-import { db } from "./src/firebase-setup.js"; // adjust if needed
+import { db } from "../src/firebase-setup.js"; // adjust if needed
 
 async function backfillPlayerUIDs() {
   const playersRef = collection(db, "players");

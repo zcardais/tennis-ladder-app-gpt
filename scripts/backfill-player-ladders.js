@@ -1,5 +1,5 @@
 import { getDocs, collection, doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "./firebase-setup.js"; // Adjust path if needed
+import { db } from "../src/firebase-setup.js";
 
 async function backfillPlayerLadders() {
   const laddersSnap = await getDocs(collection(db, "ladders"));

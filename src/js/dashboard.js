@@ -9,7 +9,7 @@ export async function init() {
 
   const laddersList = document.getElementById('joined-ladders');
 
-  async function fetchJoinedLadders(uid) {
+  async function fetchJoinedLadders(uid, playerId) {
     let ladderCount = 0;
     try {
       // Clear existing ladder cards to avoid duplicates
@@ -22,7 +22,7 @@ export async function init() {
       for (const ladderDoc of querySnapshot.docs) {
         const ladder = ladderDoc.data();
         const participants = ladder.participants || [];
-        if (!participants.includes(uid)) continue;
+        if (!participants.includes(playerId)) continue;
         ladderCount++;
         hasLadders = true;
 
@@ -190,8 +190,10 @@ export async function init() {
     const playersSnap = await getDocs(playersQuery);
 
     let player;
+    let playerId;
     if (!playersSnap.empty) {
       player = playersSnap.docs[0].data();
+      playerId = playersSnap.docs[0].id;
     } else {
       // Auto-create player profile
       const playerData = {
@@ -219,7 +221,76 @@ export async function init() {
       });
     }
 
-    fetchJoinedLadders(uid);
+    // Load and display primary ladder first, if set
+    const primaryLadderId = player.primaryLadderId;
+    if (primaryLadderId) {
+      try {
+        const ladderDoc = await getDoc(doc(db, "ladders", primaryLadderId));
+        if (ladderDoc.exists()) {
+          const ladderData = ladderDoc.data();
+          ladderData.name = ladderData.name || "Unnamed Ladder";
+          ladderData.description = ladderData.description || "";
+          ladderData.mockRank = ladderData.mockRank || "–";
+          ladderData.mockRating = ladderData.mockRating || "–";
+          ladderData.endDate = ladderData.endDate || new Date().toISOString();
+
+          const endDateObj = new Date(ladderData.endDate);
+          const today = new Date();
+          const msPerDay = 1000 * 60 * 60 * 24;
+          const daysLeft = Math.max(0, Math.ceil((endDateObj - today) / msPerDay));
+
+          const recordText = "–"; // Optionally calculate record here if needed
+
+          const ladderDiv = document.createElement('div');
+          ladderDiv.className = 'bg-white rounded-xl shadow p-4';
+          ladderDiv.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white text-xl">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10l9-9m0 0l9 9m-9-9v18"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-lg font-bold text-gray-800">${ladderData.name}</h2>
+                  <p class="text-sm text-gray-500">${ladderData.description}</p>
+                </div>
+              </div>
+            </div>
+            <div class="flex justify-between text-center text-sm text-gray-700 mb-2">
+              <div>
+                <p class="text-lg font-bold text-blue-600">#${ladderData.mockRank}</p>
+                <p class="text-xs text-gray-500">Your Rank</p>
+              </div>
+              <div>
+                <p class="text-lg font-bold text-blue-600">${ladderData.mockRating}</p>
+                <p class="text-xs text-gray-500">Rating</p>
+              </div>
+              <div>
+                <p class="text-lg font-bold text-blue-600">${recordText}</p>
+                <p class="text-xs text-gray-500">Record</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center text-sm text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+                </svg>
+                <span>Ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}</span>
+              </div>
+              <a href="ladder.html?ladderId=${primaryLadderId}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                View Ladder
+              </a>
+            </div>
+          `;
+          document.getElementById('joined-ladders')?.prepend(ladderDiv);
+        }
+      } catch (err) {
+        console.error("Failed to load primary ladder:", err);
+      }
+    }
+    fetchJoinedLadders(uid, playerId);
     fetchRecentMatches(uid);
   });
 }

@@ -102,6 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Update ladder memberships
       const selected = Array.from(form.querySelectorAll("input[name='ladders']:checked")).map(cb => cb.value);
+      const primaryLadderId = selected.length > 0 ? selected[0] : null;
       // For each active ladder, add or remove membership
       for (const docSnap of snapL.docs) {
         const ladderId = docSnap.id;
@@ -110,10 +111,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const shouldBeMember = selected.includes(ladderId);
         if (!isMember && shouldBeMember) {
           await updateDoc(ladderRef, { participants: arrayUnion(playerId) });
-          await updateDoc(playerRef, { status: "active" });
+          await updateDoc(playerRef, {
+            status: "active",
+            ladders: arrayUnion(ladderId),
+            primaryLadderId
+          });
         } else if (isMember && !shouldBeMember) {
           await updateDoc(ladderRef, { participants: arrayRemove(playerId) });
         }
+      }
+      // If no ladders are selected, set primaryLadderId to null
+      if (selected.length === 0) {
+        await updateDoc(playerRef, { primaryLadderId: null });
       }
 
       statusMessageDiv.textContent = '✅ Player updated successfully.';

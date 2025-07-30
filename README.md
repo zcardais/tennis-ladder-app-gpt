@@ -45,3 +45,21 @@ This is a mobile-first web application for managing singles and doubles tennis l
 
 This repo is for personal use and development. Once core flows are solid, I may invite 2–3 friends for private testing.
 
+# Scripts
+
+This folder contains one-time or utility scripts for managing Firestore data.
+
+## Scripts Included
+
+### `backfill-player-ladders.js`
+Adds a `ladders` array to each player document based on the ladder’s `participants[]`.
+
+### `remove-ladderId-from-players.js`
+Removes the obsolete `ladderId` field from player documents now that we support multi-ladder participation.
+
+## Usage
+
+Run any script from the project root:
+```bash
+node scripts/script-name.js
+```
