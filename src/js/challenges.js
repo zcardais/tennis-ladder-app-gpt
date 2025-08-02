@@ -4,24 +4,38 @@ import {
   doc,
   getDoc,
   updateDoc,
-  serverTimestamp
+  serverTimestamp,
+  query,
+  where
 } from "firebase/firestore";
 import { db, getCurrentUID } from "../firebase-setup.js";
 import { auth } from "../firebase-setup.js";
 import { onAuthStateChanged } from "firebase/auth";
-import { query, where } from "firebase/firestore";
+// Additional imports for Firestore queries
 
 const playerNameCache = {};
 
 async function getPlayerName(uid) {
   if (playerNameCache[uid]) return playerNameCache[uid];
 
-  const playerRef = doc(db, "players", uid);
-  const playerSnap = await getDoc(playerRef);
-  const name = playerSnap.exists()
-    ? playerSnap.data().firstName || uid
-    : uid;
-
+  // Find the player document whose 'uid' field matches
+  const playersRef = collection(db, "players");
+  const uidQuery = query(playersRef, where("uid", "==", uid));
+  const querySnap = await getDocs(uidQuery);
+  // Use the first matching document (if any)
+  const playerSnap = !querySnap.empty ? querySnap.docs[0] : null;
+  let name;
+  if (playerSnap && playerSnap.exists()) {
+    const first = playerSnap.data().firstName || "";
+    const last = playerSnap.data().lastName || "";
+    name = (first || last)
+      ? `${first} ${last}`.trim()
+      : playerSnap.data().username || uid;
+  } else if (auth.currentUser && auth.currentUser.uid === uid && auth.currentUser.displayName) {
+    name = auth.currentUser.displayName;
+  } else {
+    name = uid;
+  }
   playerNameCache[uid] = name;
   return name;
 }
@@ -41,10 +55,10 @@ function showToast(message, type = "success") {
 
 console.log("Challenges.js loaded");
 
-async function fetchChallenges(uid) {
+async function fetchActiveChallenges(uid) {
   const q = query(
     collection(db, "challenges"),
-    where("status", "in", ["pending", "accepted", "completed"])
+    where("status", "in", ["pending", "accepted"])
   );
   const snap = await getDocs(q);
 
@@ -52,19 +66,68 @@ async function fetchChallenges(uid) {
   for (const docSnap of snap.docs) {
     const data = docSnap.data();
     if (data.challenger === uid || data.opponent === uid) {
-      const challengerName = await getPlayerName(data.challenger);
-      const opponentName = await getPlayerName(data.opponent);
-      challenges.push({
-        id: docSnap.id,
-        ...data,
-        challengerName,
-        opponentName
-      });
+      if ((data.status === "pending" || data.status === "accepted") && !data.completedAt) {
+        const challengerName = await getPlayerName(data.challenger);
+        const opponentName = await getPlayerName(data.opponent);
+
+        // Fetch challenger player document to get uid field
+        const challengerPlayerRef = doc(db, "players", data.challenger);
+        const challengerPlayerSnap = await getDoc(challengerPlayerRef);
+        const challengerUid = challengerPlayerSnap.exists() ? challengerPlayerSnap.data().uid || data.challenger : data.challenger;
+
+        // Fetch opponent player document to get uid field
+        const opponentPlayerRef = doc(db, "players", data.opponent);
+        const opponentPlayerSnap = await getDoc(opponentPlayerRef);
+        const opponentUid = opponentPlayerSnap.exists() ? opponentPlayerSnap.data().uid || data.opponent : data.opponent;
+
+        challenges.push({
+          id: docSnap.id,
+          ...data,
+          challengerName,
+          opponentName,
+          challengerUid,
+          opponentUid
+        });
+      }
     }
   }
 
-  console.log("Fetched challenges:", challenges);
+  console.log("Fetched active challenges:", challenges);
+  console.log("fetchActiveChallenges IDs:", challenges.map(c => c.id));
   return challenges;
+}
+
+async function fetchCompletedChallenges(uid) {
+  const q = query(
+    collection(db, "challenges"),
+    where("status", "==", "completed")
+  );
+  const snap = await getDocs(q);
+  const completed = [];
+  for (const docSnap of snap.docs) {
+    const data = docSnap.data();
+    if (data.challenger === uid || data.opponent === uid) {
+      const challengerName = await getPlayerName(data.challenger);
+      const opponentName  = await getPlayerName(data.opponent);
+      // fetch challengerUid/opponentUid same as in active
+      const challengerPlayerRef = doc(db, "players", data.challenger);
+      const challengerPlayerSnap = await getDoc(challengerPlayerRef);
+      const challengerUid = challengerPlayerSnap.exists() ? challengerPlayerSnap.data().uid || data.challenger : data.challenger;
+      const opponentPlayerRef = doc(db, "players", data.opponent);
+      const opponentPlayerSnap = await getDoc(opponentPlayerRef);
+      const opponentUid = opponentPlayerSnap.exists() ? opponentPlayerSnap.data().uid || data.opponent : data.opponent;
+      completed.push({
+        id: docSnap.id,
+        ...data,
+        challengerName,
+        opponentName,
+        challengerUid,
+        opponentUid
+      });
+    }
+  }
+  console.log("Fetched completed challenges:", completed.map(c => c.id));
+  return completed;
 }
 
 function formatDate(dateIssued) {
@@ -78,28 +141,36 @@ function formatDate(dateIssued) {
   }
 }
 
-function renderChallenges(challenges, currentUid) {
+function renderActiveChallenges(challenges, currentUid, completedIds = []) {
+  console.log("renderActiveChallenges input IDs:", challenges.map(c => c.id), "completedIds:", completedIds);
   const feed = document.getElementById("challenges-feed");
   const history = document.getElementById("history-feed");
 
   feed.innerHTML = "";
   history.innerHTML = "";
 
-  if (!challenges.length) {
+  // Exclude any challenges already completed or in completedIds
+  const activeList = challenges.filter(c => c.status !== "completed" && !c.completedAt && !completedIds.includes(c.id));
+  console.log("renderActiveChallenges activeList IDs:", activeList.map(c => c.id));
+  if (!activeList.length) {
     feed.innerHTML = "<p class='text-gray-100'>No active challenges.</p>";
     return;
   }
 
-  challenges.forEach((challenge) => {
+  activeList.forEach((challenge) => {
     const formattedDate = formatDate(challenge.dateIssued);
-    let html = `
-      <div class="bg-white rounded-lg p-4 shadow">
-    `;
 
-    if (challenge.status === "pending") {
+    if (challenge.status === "pending" && !challenge.completedAt) {
+      let html = `
+      <div data-id="${challenge.id}" class="bg-white rounded-lg p-4 shadow">
+    `;
       if (challenge.opponent === currentUid) {
         html += `
-          <p class="font-bold text-lg">${challenge.challengerName} vs. ${challenge.opponentName}</p>
+          <p class="font-bold text-lg">
+            ${challenge.challengerUid === currentUid ? "You" : challenge.challengerName}
+            vs.
+            ${challenge.opponentUid === currentUid ? "You" : challenge.opponentName}
+          </p>
           <p class="text-gray-600">Date Issued: ${formattedDate}</p>
           <div class="mt-2 flex space-x-2">
             <button onclick="handleAccept('${challenge.id}')" class="bg-green-500 text-white px-3 py-1 rounded">Accept</button>
@@ -108,16 +179,25 @@ function renderChallenges(challenges, currentUid) {
         `;
       } else {
         html += `
-          <p class="font-bold text-lg">${challenge.challengerName} vs. ${challenge.opponentName}</p>
+          <p class="font-bold text-lg">
+            ${challenge.challengerUid === currentUid ? "You" : challenge.challengerName}
+            vs.
+            ${challenge.opponentUid === currentUid ? "You" : challenge.opponentName}
+          </p>
           <p class="text-gray-600">Date Issued: ${formattedDate}</p>
-          <p class="italic text-gray-500 mt-2">Waiting for opponent to accept...</p>
+          <p class="italic text-gray-500 mt-2">Waiting for ${challenge.opponentUid === currentUid ? "you" : challenge.opponentName} to accept...</p>
         `;
       }
       html += `</div>`;
       feed.innerHTML += html;
-    } else if (challenge.status === "accepted") {
-      html += `
-        <p class="font-bold text-lg">${challenge.challengerName} vs. ${challenge.opponentName}</p>
+    } else if (challenge.status === "accepted" && !challenge.completedAt) {
+      let html = `
+        <div data-id="${challenge.id}" class="bg-white rounded-lg p-4 shadow">
+        <p class="font-bold text-lg">
+          ${challenge.challengerUid === currentUid ? "You" : challenge.challengerName}
+          vs.
+          ${challenge.opponentUid === currentUid ? "You" : challenge.opponentName}
+        </p>
         <p class="text-gray-600">Date Issued: ${formattedDate}</p>
         <div class="mt-2">
           <button onclick="handleReport('${challenge.id}')" class="bg-blue-500 text-white px-3 py-1 rounded">Report Score</button>
@@ -125,34 +205,46 @@ function renderChallenges(challenges, currentUid) {
       `;
       html += `</div>`;
       feed.innerHTML += html;
-    } else if (challenge.status === "completed") {
-      const sets = challenge.score?.sets || [];
-      const player1 = challenge.challengerName;
-      const player2 = challenge.opponentName;
-
-      let player1Wins = 0;
-      let player2Wins = 0;
-
-      sets.forEach((set) => {
-        if (set.you > set.them) player1Wins++;
-        else if (set.them > set.you) player2Wins++;
-      });
-
-      const winner = player1Wins > player2Wins ? player1 : player2;
-      const loser = player1Wins > player2Wins ? player2 : player1;
-      const scoreString = sets
-        .filter(set => !(set.you === 0 && set.them === 0))
-        .map(set => `${set.you}-${set.them}`)
-        .join(", ");
-      const completedDate = challenge.completedAt?.toDate?.().toISOString().split("T")[0] || "Unknown";
-
-      html += `
-        <p class="text-xl text-gray-800"><b>${winner}</b> def. ${loser} | ${scoreString}</p>
-        <p class="text-gray-600 text-sm">Date reported: ${completedDate}</p>
-      `;
-      html += `</div>`;
-      history.innerHTML += html;
     }
+  });
+}
+
+function renderCompletedChallenges(challenges, currentUid) {
+  console.log("renderCompletedChallenges input IDs:", challenges.map(c => c.id));
+  const history = document.getElementById("history-feed");
+  history.innerHTML = "";
+
+  challenges.forEach((challenge) => {
+    let html = `
+      <div data-id="${challenge.id}" class="bg-white rounded-lg p-4 shadow">
+    `;
+    const sets = challenge.score?.sets || [];
+    const isYou = challenge.challengerUid === currentUid;
+    const player1 = isYou ? "You" : challenge.challengerName;
+    const player2 = isYou ? challenge.opponentName : "You";
+
+    let player1Wins = 0;
+    let player2Wins = 0;
+
+    sets.forEach((set) => {
+      if (set.you > set.them) player1Wins++;
+      else if (set.them > set.you) player2Wins++;
+    });
+
+    const winner = player1Wins > player2Wins ? player1 : player2;
+    const loser = player1Wins > player2Wins ? player2 : player1;
+    const scoreString = sets
+      .filter(set => !(set.you === 0 && set.them === 0))
+      .map(set => `${set.you}-${set.them}`)
+      .join(", ");
+    const completedDate = challenge.completedAt?.toDate?.().toISOString().split("T")[0] || "Unknown";
+
+    html += `
+      <p class="text-xl text-gray-800"><b>${winner}</b> def. ${loser} | ${scoreString}</p>
+      <p class="text-gray-600 text-sm">Date reported: ${completedDate}</p>
+    `;
+    html += `</div>`;
+    history.innerHTML += html;
   });
 }
 
@@ -213,11 +305,19 @@ export function init() {
       return;
     }
 
-    const uid = getCurrentUID();
+    const uid = user.uid;
     console.log("Challenges init for user:", uid);
     try {
-      const challenges = await fetchChallenges(uid);
-      renderChallenges(challenges, uid);
+      // Fetch both lists
+      const [active, completed] = await Promise.all([
+        fetchActiveChallenges(uid),
+        fetchCompletedChallenges(uid)
+      ]);
+      console.log("init fetched active IDs:", active.map(c => c.id), "completed IDs:", completed.map(c => c.id));
+      const completedIds = completed.map(c => c.id);
+      // Render, excluding completed IDs from the active list
+      renderActiveChallenges(active, uid, completedIds);
+      renderCompletedChallenges(completed, uid);
     } catch (err) {
       console.error("🔥 Error initializing challenges:", err);
     }

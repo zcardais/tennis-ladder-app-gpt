@@ -11,15 +11,19 @@
 - [ ] Test on iPad and desktop screen widths
 
 - [x] Add "Recent Matches" module to Dashboard (show last 3–5 matches, link to full match history)
-- [ ] Wire up View All Matches button on dashboard.html
-- [ ] Wire up profile.html os that it shows my profile information using uid
+- [x] Wire up View All Matches button on dashboard.html
+- [x] Wire up profile.html so that it shows my profile information using uid
 - [ ] Wire up all user pages to show user-specific data e.g. stats, profile, ladders…
-- [ ] 
+  - [x] stats.html
+  - [x] profile.html
+  - [ ] ladder.html
+
 
 ---
 
 ## ⚙️ Medium Priority
-- [ ] Improve W–L display in player cards (styled badge or “3–2” shorthand)
+- [x] Update Challenge cards to show challenger's name instead of uid
+- [x] Improve W–L display in player cards (styled badge or “3–2” shorthand)
 - [ ] Add challenge expiration countdown or status indicator
 - [ ] Wildcard challenge system (admin config per ladder)
 - [ ] Challenge acceptance window with auto-decline after X days
@@ -41,7 +45,7 @@
 - [ ] Add “My Active Challenges” tab (sent and received)
 - [ ] Add favicon and app title to match brand
 - [ ] Convert toast logic to a reusable module
-- [ ] Polish loading states on slower network
+- [x] Polish loading states on slower network
 - [ ] Admin dashboard with ladder health stats (active %, pending challenges, stale matches)
 - [ ] Admin impersonation or “view as player” mode for support/debug
 
@@ -56,6 +60,19 @@
 ## Phase II
 - [ ] Support doubles ladder structure (team creation, pairing logic) *(phase 2 – plan schema now)*
 
+## 🏛️ Clubs Integration (Planned)
+
+- [ ] Create a `clubs` collection (fields: `name`, `createdAt`, `createdByUid`, `adminUids`)
+- [ ] Add `clubId` to `players` documents on creation/invite
+- [ ] Add `clubId` to `ladders` when created
+- [ ] Restrict all queries (ladders, players, matches) to current user's `clubId`
+- [ ] Update dashboard to only show ladders for user's club
+- [ ] Update “Invite Player” flow to assign player to inviter’s `clubId`
+- [ ] Build "Create Club" admin flow (set `name`, store admin as creator)
+- [ ] Update Firestore security rules to enforce `clubId` scoping
+- [ ] (Optional) Add club-level branding settings (color, logo, tagline)
+- [ ] (Optional) Create `club.html` admin panel to manage players, ladders, and branding
+
 ---
 
 ## ✅ Completed
@@ -69,6 +86,11 @@
 - [x] Responsive layout + mobile-first design
 
 - [x] Link current user to `auth.currentUser.uid` throughout app
+- [x] Update Challenge cards to show challenger's name instead of uid
+- [x] Fetch and display actual W–L records in each dashboard ladder card (replace mockRecord)
+- [x] Improve record (W–L) rendering in player cards
+- [x] Display actual win/loss record on ladder.html top card
+- [x] Show player initials and name correctly throughout app
 
 --- --- --- --- --- ---
 
@@ -98,6 +120,8 @@
 - [x] Display “Issue Challenge” buttons (except self)
 - [x] Instantly create `challenges` doc on button click
 - [x] Prevent issuing a challenge if one is already pending
+- [x] Display actual win/loss record on ladder.html top card
+- [x] Show player initials and name correctly throughout app
 
 ---
 
@@ -130,7 +154,7 @@
 ## 🧹 Polish Ideas
 - [x] Replace alert() with toast notifications
 - [x] Add loading states or spinners
-- [ ] Improve record (W–L) rendering in player cards
+- [x] Improve record (W–L) rendering in player cards
 - [ ] Add page for viewing all my active challenges
 - [ ] Polish stats.html page to match mockup
   - [ ] stats page URL needs to grab player ID or user UID

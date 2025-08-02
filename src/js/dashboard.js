@@ -59,7 +59,16 @@ export async function init() {
         const msPerDay = 1000 * 60 * 60 * 24;
         const daysLeft = Math.max(0, Math.ceil((endDateObj - today) / msPerDay));
 
-        // Render the ladder card with live record
+        // Compute player's actual rank in this ladder
+        let rank = "–";
+        if (Array.isArray(participants) && participants.length > 0) {
+          const idx = participants.indexOf(playerId);
+          if (idx !== -1) {
+            rank = idx + 1;
+          }
+        }
+
+        // Render the ladder card with live record and actual rank
         const ladderDiv = document.createElement('div');
         ladderDiv.className = 'bg-white rounded-xl shadow p-4';
         ladderDiv.innerHTML = `
@@ -74,13 +83,12 @@ export async function init() {
         </div>
         <div>
           <h2 class="text-lg font-bold text-gray-800">${ladder.name}</h2>
-          <p class="text-sm text-gray-500">${ladder.description}</p>
         </div>
       </div>
     </div>
     <div class="flex justify-between text-center text-sm text-gray-700 mb-2">
       <div>
-        <p class="text-lg font-bold text-blue-600">#${ladder.mockRank || '–'}</p>
+        <p class="text-lg font-bold text-blue-600">#${rank}</p>
         <p class="text-xs text-gray-500">Your Rank</p>
       </div>
       <div>
@@ -157,6 +165,12 @@ export async function init() {
 
       for (const match of recentMatches) {
         const opponentId = match.players.find(p => p !== uid);
+        const opponentDoc = await getDoc(doc(db, 'players', opponentId));
+        let fullName = opponentId;
+        if (opponentDoc.exists()) {
+          const opponentData = opponentDoc.data();
+          fullName = `${opponentData.firstName || ''} ${opponentData.lastName || ''}`.trim() || opponentId;
+        }
         const result = match.winner === uid ? "Won" : "Lost";
         const score = match.score?.sets?.map(s => `${s.you}–${s.them}`).join(', ') || "Score N/A";
         const date = match.datePlayed.toDate().toLocaleDateString();
@@ -168,7 +182,7 @@ export async function init() {
             <span class="font-medium text-gray-800">${result}</span>
             <span class="text-gray-500">${date}</span>
           </div>
-          <div class="text-gray-700">vs ${opponentId}</div>
+          <div class="text-gray-700">vs ${fullName}</div>
           <div class="text-xs text-gray-500">${score}</div>
         `;
         matchesList.appendChild(matchCard);

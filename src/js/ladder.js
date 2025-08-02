@@ -99,18 +99,51 @@ async function renderRankings(participants) {
   const list = document.getElementById("rankings-list");
   list.innerHTML = "";
 
-  // Compute win/loss record for each participant
-  const matchesRef = collection(db, "ladders", ladderId, "matches");
-  const matchesQuery = query(matchesRef, where("status", "==", "complete"));
-  const matchesSnap = await getDocs(matchesQuery);
-  const recordMap = {};
-  matchesSnap.forEach(mDoc => {
-    const { winnerId, loserId } = mDoc.data();
-    recordMap[winnerId] = recordMap[winnerId] || { wins: 0, losses: 0 };
-    recordMap[loserId]  = recordMap[loserId]  || { wins: 0, losses: 0 };
-    recordMap[winnerId].wins++;
-    recordMap[loserId].losses++;
+  // Build UID to playerId map
+  const playersSnap = await getDocs(collection(db, "players"));
+  const uidToPlayerIdMap = {};
+  playersSnap.forEach(pDoc => {
+    const pData = pDoc.data();
+    if (pData.uid) {
+      uidToPlayerIdMap[pData.uid] = pDoc.id;
+    }
   });
+  console.log("📘 UID to PlayerID Map:", uidToPlayerIdMap);
+
+  // Compute win/loss record for each participant using challenges collection
+  const challengesQuery = query(
+    collection(db, "challenges"),
+    where("ladderId", "==", ladderId),
+    where("status", "==", "completed")
+  );
+  const challengesSnap = await getDocs(challengesQuery);
+  const recordMap = {};
+  challengesSnap.forEach(cDoc => {
+    const c = cDoc.data();
+    const { winnerId, challenger, opponent } = c;
+    console.log("🏁 Challenge:", { winnerId, challenger, opponent });
+    // Only count if winnerId is present and both challenger/opponent are present
+    if (!winnerId || !challenger || !opponent) return;
+    // Convert winnerId (UID) to playerId
+    const winnerPlayerId = uidToPlayerIdMap[winnerId];
+    if (!winnerPlayerId) return; // skip if no mapping found
+    console.log("🏆 Winner Player ID:", winnerPlayerId);
+    // Determine which is winner and loser by comparing winnerPlayerId to challenger/opponent
+    if (winnerPlayerId === challenger) {
+      recordMap[challenger] = recordMap[challenger] || { wins: 0, losses: 0 };
+      recordMap[challenger].wins++;
+      recordMap[opponent] = recordMap[opponent] || { wins: 0, losses: 0 };
+      recordMap[opponent].losses++;
+    } else if (winnerPlayerId === opponent) {
+      recordMap[opponent] = recordMap[opponent] || { wins: 0, losses: 0 };
+      recordMap[opponent].wins++;
+      recordMap[challenger] = recordMap[challenger] || { wins: 0, losses: 0 };
+      recordMap[challenger].losses++;
+    }
+    // If winnerPlayerId is neither challenger nor opponent, skip (shouldn't happen)
+  });
+  // Debug log for recordMap
+  console.log("recordMap:", recordMap);
 
   // 🧩 Update player info card at top of page
   const playerDocSnap = await getDocs(query(collection(db, "players"), where("uid", "==", auth.currentUser.uid)));
@@ -134,6 +167,7 @@ async function renderRankings(participants) {
     if (nameEl) nameEl.textContent = fullName;
     if (rankEl) rankEl.textContent = playerRankIndex >= 0 ? `#${playerRankIndex + 1}` : "–";
 
+    // Use Firestore playerId for lookup in recordMap
     const wins = recordMap[playerId]?.wins || 0;
     const losses = recordMap[playerId]?.losses || 0;
     if (recordEl) recordEl.textContent = `${wins}–${losses}`;

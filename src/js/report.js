@@ -146,7 +146,9 @@ reportForm.addEventListener("submit", async (e) => {
       status: "completed",
       score: { sets },
       completedAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
+      winnerId,
+      loserId
     });
 
     console.log(`Score saved for challenge ${challengeId}`);
