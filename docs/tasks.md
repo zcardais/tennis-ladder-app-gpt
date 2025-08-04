@@ -1,8 +1,7 @@
 # ✅ Tennis Ladder App – Updated Task List (July 2025)
 
 ---
-
-- [x] Link current user to `auth.currentUser.uid` throughout app
+- [ ] Add logout button to every page
 - [ ] Auto-send ladder rules to player upon being added to ladder
 - [ ] Create “Resend Invite” button in Admin tools
 - [ ] Add final Firestore security rules before release

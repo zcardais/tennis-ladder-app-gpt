@@ -16,14 +16,27 @@ import { onAuthStateChanged } from "firebase/auth";
 const playerNameCache = {};
 
 async function getPlayerName(uid) {
-  if (playerNameCache[uid]) return playerNameCache[uid];
+  console.log(`[getPlayerName] start lookup for uid=${uid}`);
+  if (playerNameCache[uid] && playerNameCache[uid] !== uid) {
+    return playerNameCache[uid];
+  }
 
-  // Find the player document whose 'uid' field matches
+  // Find the player document whose 'uid' field matches, falling back to document ID
   const playersRef = collection(db, "players");
   const uidQuery = query(playersRef, where("uid", "==", uid));
   const querySnap = await getDocs(uidQuery);
-  // Use the first matching document (if any)
-  const playerSnap = !querySnap.empty ? querySnap.docs[0] : null;
+  console.log(`[getPlayerName] querySnap.empty=${querySnap.empty}`, querySnap.docs.map(d => ({ id: d.id, data: d.data() })));
+  let playerSnap;
+  if (!querySnap.empty) {
+    // Found by uid field
+    playerSnap = querySnap.docs[0];
+  } else {
+    // Fallback to document ID lookup
+    const directRef = doc(db, "players", uid);
+    const directSnap = await getDoc(directRef);
+    playerSnap = directSnap.exists() ? directSnap : null;
+    console.log(`[getPlayerName] directSnap.exists()=${directSnap.exists()}`, directSnap.exists() ? directSnap.data() : null);
+  }
   let name;
   if (playerSnap && playerSnap.exists()) {
     const first = playerSnap.data().firstName || "";
@@ -36,7 +49,10 @@ async function getPlayerName(uid) {
   } else {
     name = uid;
   }
-  playerNameCache[uid] = name;
+  console.log(`[getPlayerName] uid=${uid}, resolved name=${name}, fetchedFrom=${playerSnap?.id || 'none'}`);
+  if (name && name !== uid) {
+    playerNameCache[uid] = name;
+  }
   return name;
 }
 
@@ -70,15 +86,8 @@ async function fetchActiveChallenges(uid) {
         const challengerName = await getPlayerName(data.challenger);
         const opponentName = await getPlayerName(data.opponent);
 
-        // Fetch challenger player document to get uid field
-        const challengerPlayerRef = doc(db, "players", data.challenger);
-        const challengerPlayerSnap = await getDoc(challengerPlayerRef);
-        const challengerUid = challengerPlayerSnap.exists() ? challengerPlayerSnap.data().uid || data.challenger : data.challenger;
-
-        // Fetch opponent player document to get uid field
-        const opponentPlayerRef = doc(db, "players", data.opponent);
-        const opponentPlayerSnap = await getDoc(opponentPlayerRef);
-        const opponentUid = opponentPlayerSnap.exists() ? opponentPlayerSnap.data().uid || data.opponent : data.opponent;
+        const challengerUid = data.challenger;
+        const opponentUid    = data.opponent;
 
         challenges.push({
           id: docSnap.id,
@@ -109,13 +118,8 @@ async function fetchCompletedChallenges(uid) {
     if (data.challenger === uid || data.opponent === uid) {
       const challengerName = await getPlayerName(data.challenger);
       const opponentName  = await getPlayerName(data.opponent);
-      // fetch challengerUid/opponentUid same as in active
-      const challengerPlayerRef = doc(db, "players", data.challenger);
-      const challengerPlayerSnap = await getDoc(challengerPlayerRef);
-      const challengerUid = challengerPlayerSnap.exists() ? challengerPlayerSnap.data().uid || data.challenger : data.challenger;
-      const opponentPlayerRef = doc(db, "players", data.opponent);
-      const opponentPlayerSnap = await getDoc(opponentPlayerRef);
-      const opponentUid = opponentPlayerSnap.exists() ? opponentPlayerSnap.data().uid || data.opponent : data.opponent;
+      const challengerUid = data.challenger;
+      const opponentUid    = data.opponent;
       completed.push({
         id: docSnap.id,
         ...data,
@@ -162,7 +166,7 @@ function renderActiveChallenges(challenges, currentUid, completedIds = []) {
 
     if (challenge.status === "pending" && !challenge.completedAt) {
       let html = `
-      <div data-id="${challenge.id}" class="bg-white rounded-lg p-4 shadow">
+      <div data-id="${challenge.id}" class="bg-red-100 rounded-lg p-4 shadow">
     `;
       if (challenge.opponent === currentUid) {
         html += `
@@ -235,7 +239,14 @@ function renderCompletedChallenges(challenges, currentUid) {
     const loser = player1Wins > player2Wins ? player2 : player1;
     const scoreString = sets
       .filter(set => !(set.you === 0 && set.them === 0))
-      .map(set => `${set.you}-${set.them}`)
+      .map(set => {
+        // Show winner’s score first
+        if (winner === player1) {
+          return `${set.you}-${set.them}`;
+        } else {
+          return `${set.them}-${set.you}`;
+        }
+      })
       .join(", ");
     const completedDate = challenge.completedAt?.toDate?.().toISOString().split("T")[0] || "Unknown";
 
@@ -307,6 +318,9 @@ export function init() {
 
     const uid = user.uid;
     console.log("Challenges init for user:", uid);
+    // Debug: list all player doc IDs to verify existence
+    const allPlayersSnap = await getDocs(collection(db, "players"));
+    console.log("[Debug] All player document IDs:", allPlayersSnap.docs.map(d => d.id));
     try {
       // Fetch both lists
       const [active, completed] = await Promise.all([

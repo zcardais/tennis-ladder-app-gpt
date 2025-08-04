@@ -5,119 +5,123 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
-<body class="bg-gradient-to-br from-indigo-500 to-purple-600 min-h-screen text-gray-900">
+<body class="bg-gray-100 min-h-screen text-gray-800">
   <script type="module" src="/src/js/protect.js"></script>
-	<div class="container mx-auto px-2 flex flex-col min-h-screen py-6">
+  <!-- Purple Gradient Header -->
+  <div class="bg-gradient-to-r from-purple-500 to-indigo-600 px-6 py-8 relative rounded-b-2xl">
+    <!-- Logout Button -->
+    <button id="logout-button" class="absolute left-6 top-8 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+      <i class="fa-solid fa-arrow-right-from-bracket text-white text-lg"></i>
+    </button>
+    <!-- Refresh Button -->
+    <button onclick="window.location.reload()" class="absolute right-6 top-8 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+      <i class="fa-solid fa-sync text-white text-lg"></i>
+    </button>
+    <!-- Dashboard Title -->
+    <div class="text-center pt-4">
+      <h1 class="text-2xl font-bold text-white">Dashboard</h1>
+    </div>
+  </div>
+	<div class="bg-white">
 	
-	<!-- Header -->
-	<div class="px-2 pt-6 pb-4 flex justify-between items-center text-white">
-	  <h1 class="text-xl font-bold">Welcome back!</h1>
-	  <div class="flex items-center gap-4">
-	    <div id="user-name" class="text-sm font-medium">Loading...</div>
-	    <button id="logout-btn" class="text-xs bg-white text-indigo-600 font-semibold py-1 px-2 rounded hover:bg-indigo-100">Logout</button>
-	  </div>
-	</div>
 
-	<!-- Ladder Stats -->
-	<div class="px-2 pb-4">
-	  <div class="rounded-xl border border-white/50 p-4 flex justify-between text-center text-sm text-white">
-		<div>
-		  <p id="stat-ladders" class="text-2xl font-bold text-white">0</p>
-		  <p class="text-sm text-white/80 leading-tight">Active<br />Ladders</p>
-		</div>
-		<div>
-		  <p id="stat-challenges" class="text-2xl font-bold text-white">0</p>
-		  <p class="text-sm text-white/80 leading-tight">Pending<br />Challenges</p>
-		</div>
-		<div>
-		  <p id="stat-matches" class="text-2xl font-bold text-white">0</p>
-		  <p class="text-sm text-white/80 leading-tight">Matches<br />This Month</p>
-		</div>
-	  </div>
-	</div>
-
-	<!-- Ladder List -->
-	<div class="px-2 pb-4 flex-1">
-	  <h2 class="text-xl font-semibold text-white mb-4">Your Ladders</h2>
-	  <div id="joined-ladders" class="space-y-4 mt-4">
-	    <!-- Ladder cards will be injected here by dashboard.js -->
-	  </div>
-	</div>
-
-	<!-- Recent Matches -->
-	<div class="px-2 pb-4">
-	  <h2 class="text-xl font-semibold text-white mb-4">Recent Matches</h2>
-	  <div id="recent-matches" class="space-y-2">
-	    <p class="text-sm text-white/70">Loading recent matches...</p>
-	  </div>
-	  <a href="stats.html#history" class="mt-4 block w-full bg-white text-indigo-600 font-semibold py-2 rounded text-center hover:bg-indigo-100">
-	    View All Matches
+	<!-- Dashboard Menu -->
+	<nav class="divide-y divide-gray-200">
+	  <a href="ladder.html" class="flex items-center px-4 py-3 hover:bg-gray-50">
+	    <div class="bg-green-100 text-green-600 p-2 rounded mr-4">
+	      <i class="fa-solid fa-trophy"></i>
+	    </div>
+	    <span class="flex-1 font-medium">My Ladders</span>
+	    <span id="stat-ladders" class="bg-gray-300 text-gray-800 text-sm px-2 py-1 rounded-full mr-2">0</span>
+	    <i class="fa-solid fa-chevron-right text-purple-600"></i>
 	  </a>
+	  <a href="challenges.html" class="flex items-center px-4 py-3 hover:bg-gray-50">
+	    <div class="bg-blue-100 text-blue-600 p-2 rounded mr-4">
+	      <i class="fa-solid fa-handshake"></i>
+	    </div>
+	    <span class="flex-1 font-medium">My Challenges</span>
+	    <span id="stat-challenges" class="bg-gray-300 text-gray-800 text-sm px-2 py-1 rounded-full mr-2">0</span>
+	    <i class="fa-solid fa-chevron-right text-purple-600"></i>
+	  </a>
+	  <a href="matches.html" class="flex items-center px-4 py-3 hover:bg-gray-50">
+	    <div class="bg-purple-100 text-purple-600 p-2 rounded mr-4">
+	      <i class="fa-solid fa-chart-line"></i>
+	    </div>
+	    <span class="flex-1 font-medium">My Results</span>
+	    <span id="stat-matches" class="bg-gray-300 text-gray-800 text-sm px-2 py-1 rounded-full mr-2">0</span>
+	    <i class="fa-solid fa-chevron-right text-purple-600"></i>
+	  </a>
+	  <a href="matches.html" class="flex items-center px-4 py-3 hover:bg-gray-50">
+	    <div class="bg-gray-100 text-gray-600 p-2 rounded mr-4">
+	      <i class="fa-solid fa-list"></i>
+	    </div>
+	    <span class="flex-1 font-medium">All Matches</span>
+	    <i class="fa-solid fa-chevron-right text-purple-600"></i>
+	  </a>
+	  <a href="profile.html" class="flex items-center px-4 py-3 hover:bg-gray-50">
+	    <div class="bg-green-100 text-green-600 p-2 rounded mr-4">
+	      <i class="fa-solid fa-user"></i>
+	    </div>
+	    <span class="flex-1 font-medium">My Profile</span>
+	    <i class="fa-solid fa-chevron-right text-purple-600"></i>
+	  </a>
+	  <a href="create-challenge.html" class="flex items-center px-4 py-3 hover:bg-gray-50">
+	    <div class="bg-red-100 text-red-600 p-2 rounded mr-4">
+	      <i class="fa-solid fa-plus"></i>
+	    </div>
+	    <span class="flex-1 font-medium">Create Challenge</span>
+	    <i class="fa-solid fa-chevron-right text-purple-600"></i>
+	  </a>
+      <!-- Admin Panel (Admin only) -->
+      <a id="admin-panel-link" href="admin/index.html" class="flex items-center px-4 py-3 hover:bg-gray-50" style="display: none;">
+        <div class="bg-yellow-100 text-yellow-800 p-2 rounded mr-4">
+          <i class="fa-solid fa-shield-alt"></i>
+        </div>
+        <span class="flex-1 font-medium">Admin Panel</span>
+        <i class="fa-solid fa-chevron-right text-purple-600"></i>
+      </a>
+	</nav>
 	</div>
 
-	<!-- Quick Actions -->
-	<div class="px-2 pb-24 space-y-3">
-	  <a href="challenges.html#accepted" class="block w-full bg-indigo-600 text-white text-center py-3 rounded-xl font-semibold shadow">Report a Score</a>
-	  <div id="admin-panel-button" class="admin-only hidden">
-	    <a href="admin/index.html" class="block w-full bg-red-600 text-white text-center py-3 rounded-xl font-semibold shadow">Admin Panel</a>
-	  </div>
-	</div>
 
 	<!-- Bottom Navigation -->
-	<div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 py-3 z-50">
-	  <div class="flex justify-around">
-		<a href="dashboard.html" class="flex flex-col items-center space-y-1 text-blue-600 font-medium">
-		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-			  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-		  </svg>
-		  <span class="text-xs">Home</span>
-		</a>
-		<a href="dashboard.html#ladders" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
-		  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-			<path
-			  d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
-		  </svg>
-		  <span class="text-xs">Ladders</span>
-		</a>
-		<a href="challenges.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
-		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-			  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-		  </svg>
-		  <span class="text-xs">Challenges</span>
-		</a>
-		<a href="stats.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
-		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-			  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-		  </svg>
-		  <span class="text-xs">Stats</span>
-		</a>
-		<a href="profile.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
-		  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-			  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-		  </svg>
-		  <span class="text-xs">Profile</span>
-		</a>
-		<nav>
-  <a href="/docs/tasks.md" class="flex flex-col items-center text-xs text-gray-400 hover:text-blue-500">
-    <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M4 4h16v16H4z"></path>
-    </svg>
-    Tasks
-  </a>
-</nav>
-	  </div>
-	</div>
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 py-3 z-50">
+  <div class="flex justify-around">
+    <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-blue-600 font-medium transition">
+      <!-- Home Icon -->
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+      <span class="text-xs">Home</span>
+    </a>
+    <a href="challenges.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
+      <!-- Challenges Icon -->
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+      </svg>
+      <span class="text-xs">Challenges</span>
+    </a>
+    <a href="stats.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
+      <!-- Stats Icon -->
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+      </svg>
+      <span class="text-xs">Stats</span>
+    </a>
+    <a href="profile.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
+      <!-- Profile Icon -->
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+      </svg>
+      <span class="text-xs">Profile</span>
+    </a>
   </div>
+</div>
 
   <!-- Ladder Script -->
   <script type="module" src="/src/js/dashboard.js"></script>
   <script type="module" src="/src/main.js"></script>
-  
-  <script type="module" src="/src/js/logout.js"></script>
 </body>
 </html>

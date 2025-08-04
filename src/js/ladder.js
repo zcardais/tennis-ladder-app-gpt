@@ -144,6 +144,25 @@ async function renderRankings(participants) {
   });
   // Debug log for recordMap
   console.log("recordMap:", recordMap);
+  // Position Swap (Leapfrog) ranking: apply completed matches in order
+  challengesSnap.forEach(cDoc => {
+    const c = cDoc.data();
+    const { winnerId, challenger, opponent } = c;
+    const winnerPlayerId = uidToPlayerIdMap[winnerId];
+    if (!winnerPlayerId) return;
+    // Identify loser Player ID
+    let loserId = null;
+    if (winnerPlayerId === challenger) loserId = opponent;
+    else if (winnerPlayerId === opponent) loserId = challenger;
+    if (!loserId) return;
+    const winnerIdx = participants.indexOf(winnerPlayerId);
+    const loserIdx = participants.indexOf(loserId);
+    // If winner was ranked below loser, move winner just above loser
+    if (winnerIdx > loserIdx) {
+      participants.splice(winnerIdx, 1);
+      participants.splice(loserIdx, 0, winnerPlayerId);
+    }
+  });
 
   // 🧩 Update player info card at top of page
   const playerDocSnap = await getDocs(query(collection(db, "players"), where("uid", "==", auth.currentUser.uid)));

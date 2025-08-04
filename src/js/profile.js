@@ -14,9 +14,16 @@ export function init() {
     const uid = user.uid;
     const playerQuery = query(collection(db, "players"), where("uid", "==", uid));
     const snap = await getDocs(playerQuery);
-    if (snap.empty) return;
-
-    const playerDoc = snap.docs[0];
+    let playerDoc;
+    if (snap.empty) {
+      // Fallback to document ID lookup if no doc matches uid field
+      const docRef = doc(db, "players", uid);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists()) return;
+      playerDoc = docSnap;
+    } else {
+      playerDoc = snap.docs[0];
+    }
     const playerData = playerDoc.data();
     const playerId = playerDoc.id;
 

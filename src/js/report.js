@@ -81,20 +81,26 @@ async function loadMatchDetails() {
     });
   }
 
-  // Fetch ladderId and player ranks
+  // Fetch ladder participants array to compute ranks
   const ladderId = data.ladderId;
+  const ladderRef = doc(db, "ladders", ladderId);
+  const ladderSnap = await getDoc(ladderRef);
+  const participants = ladderSnap.exists() ? ladderSnap.data().participants || [] : [];
+  const challengerRank = participants.indexOf(challenger) + 1 || "?";
+  const opponentRank = participants.indexOf(opponent) + 1 || "?";
 
-  const getRank = async (ladderId, uid) => {
-    const playerRef = doc(db, "ladders", ladderId, "players", uid);
-    const playerSnap = await getDoc(playerRef);
-    return playerSnap.exists() ? playerSnap.data().rank || "?" : "?";
-  };
-
-  const challengerRank = await getRank(ladderId, challenger);
-  const opponentRank = await getRank(ladderId, opponent);
-
+  const currentUid = getCurrentUID();
+  // Build header with rank placeholders
+  let headerHtml;
+  if (currentUid === challenger) {
+    // Current user challenged; show "You (yourRank) vs. Opponent (opponentRank)"
+    headerHtml = `You (${challengerRank}) vs. ${opponentName} (${opponentRank})`;
+  } else {
+    // Current user is opponent; show "Challenger (challengerRank) vs. You (yourRank)"
+    headerHtml = `${challengerName} (${challengerRank}) vs. You (${opponentRank})`;
+  }
   summaryEl.innerHTML = `
-    <p class="font-semibold text-lg">${challengerName} (${challengerRank}) vs. ${opponentName} (${opponentRank})</p>
+    <p class="font-semibold text-lg">${headerHtml}</p>
     <p class="text-sm text-white/70 mt-1">Date Issued: ${dateStr}</p>
   `;
 }
@@ -127,24 +133,36 @@ reportForm.addEventListener("submit", async (e) => {
     const challengeSnap = await getDoc(challengeRef);
     const challengeData = challengeSnap.data();
 
-    // Determine winner and loser (simple MVP logic: whoever won most sets)
-    let player1Wins = 0;
-    let player2Wins = 0;
+    // Determine if current user is challenger and normalize input mapping
+    const currentUid = getCurrentUID();
+    const isChallenger = currentUid === challengeData.challenger;
 
+    // Compute win counts
+    let challengerWins = 0;
+    let opponentWins = 0;
     sets.forEach(set => {
-      if (set.you > set.them) player1Wins++;
-      else if (set.them > set.you) player2Wins++;
+      const challengerScore = isChallenger ? set.you : set.them;
+      const opponentScore    = isChallenger ? set.them : set.you;
+      if (challengerScore > opponentScore) challengerWins++;
+      else if (opponentScore > challengerScore) opponentWins++;
     });
 
-    const winnerId = player1Wins > player2Wins ? challengeData.challenger : challengeData.opponent;
-    const loserId = winnerId === challengeData.challenger ? challengeData.opponent : challengeData.challenger;
+    // Determine winner/loser IDs
+    const winnerId = challengerWins > opponentWins ? challengeData.challenger : challengeData.opponent;
+    const loserId  = winnerId === challengeData.challenger ? challengeData.opponent : challengeData.challenger;
 
-    console.log(`Winner: ${winnerId}, Loser: ${loserId}`);
+    // Normalize sets to always be [challengerScore, opponentScore]
+    const normalizedSets = sets.map(set => ({
+      you : isChallenger ? set.you : set.them,
+      them: isChallenger ? set.them : set.you
+    }));
+
+    console.log(`Winner: ${winnerId}, Loser: ${loserId}`, normalizedSets);
 
     // ✅ Update challenge document
     await updateDoc(challengeRef, {
       status: "completed",
-      score: { sets },
+      score: { sets: normalizedSets },
       completedAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       winnerId,
@@ -161,7 +179,7 @@ reportForm.addEventListener("submit", async (e) => {
       winner: winnerId,
       loser: loserId,
       datePlayed: serverTimestamp(),
-      score: { sets }
+      score: { sets: normalizedSets }
     });
 
     console.log("New match document created in 'matches' collection");

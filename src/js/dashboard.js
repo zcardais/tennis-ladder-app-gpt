@@ -2,10 +2,22 @@
 import { db, getCurrentUID } from '../firebase-setup.js';
 import { collection, getDocs, doc, getDoc, query, where, addDoc, serverTimestamp } from 'firebase/firestore';
 import { auth } from '../firebase-setup.js';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 export async function init() {
   console.log("Dashboard loaded");
+
+  // Attach logout listener immediately when dashboard loads
+  const logoutBtn = document.getElementById('logout-button');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth)
+        .then(() => {
+          window.location.href = '/auth.html';
+        })
+        .catch(error => console.error('Error signing out:', error));
+    });
+  }
 
   const laddersList = document.getElementById('joined-ladders');
 
@@ -228,11 +240,14 @@ export async function init() {
     const displayName = `${player.firstName} ${player.lastName}`.trim() || player.username || "Player";
     document.getElementById('user-name').textContent = displayName;
 
-    // Reveal admin-only elements if player is admin
-    if (player.isAdmin) {
-      document.querySelectorAll('.admin-only').forEach(el => {
-        el.classList.remove('hidden');
-      });
+    // Show or hide admin-only elements based on isAdmin flag
+    document.querySelectorAll('.admin-only').forEach(el => {
+      el.style.display = player.isAdmin ? '' : 'none';
+    });
+    // Additionally toggle Admin Panel link if present
+    const adminLinkEl = document.getElementById('admin-panel-link');
+    if (adminLinkEl) {
+      adminLinkEl.style.display = player.isAdmin ? '' : 'none';
     }
 
     // Load and display primary ladder first, if set
@@ -306,5 +321,19 @@ export async function init() {
     }
     fetchJoinedLadders(uid, playerId);
     fetchRecentMatches(uid);
+    // Attach logout handler
+    const logoutBtn = document.getElementById('logout-button');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        signOut(auth)
+          .then(() => {
+            window.location.href = '/auth.html';
+          })
+          .catch(error => console.error('Error signing out:', error));
+      });
+    }
   });
 }
+
+// Initialize dashboard logic
+init();
