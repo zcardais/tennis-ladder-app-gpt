@@ -11,7 +11,7 @@
   <!-- Purple Gradient Header -->
   <div class="bg-gradient-to-r from-purple-500 to-indigo-600 px-6 py-8 relative">
     <!-- Logout Button -->
-    <button id="logout-button" class="absolute left-6 top-8 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+    <button id="logoutBtn" class="absolute left-6 top-8 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
       <i class="fa-solid fa-arrow-right-from-bracket text-white text-lg"></i>
     </button>
     <!-- Refresh Button -->
@@ -26,13 +26,21 @@
 
   <div class="max-w-md mx-auto py-6 px-4 pb-24 relative">
 
-	<!-- Match List -->
-	<div id="match-list" class="space-y-4"></div>
+    <!-- Filter Controls -->
+    <div id="filters" class="mb-4 space-y-2 text-white/90 text-sm">
+      <label for="ladderFilter" class="block text-sm font-medium text-white/80">Filter by Ladder</label>
+      <select id="ladderFilter" class="w-full rounded p-2 text-black bg-white">
+        <option value="all">All Ladders</option>
+      </select>
+    </div>
 
-	<!-- Bottom Navigation -->
+    <!-- Match List -->
+    <div id="match-list" class="space-y-4"></div>
+
+    <!-- Bottom Navigation -->
 <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 py-3 z-50">
   <div class="flex justify-around">
-    <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-blue-600 font-medium transition">
+    <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
       <!-- Home Icon -->
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -64,45 +72,9 @@
 </div>
   </div>
 
-  <!-- Matches Script -->
-  <script>
-	const players = JSON.parse(localStorage.getItem('players') || '[]');
-	const matches = JSON.parse(localStorage.getItem('matches') || '[]');
-
-	const playerMap = {};
-	players.forEach(p => playerMap[p.id] = p.name);
-
-	const container = document.getElementById('match-list');
-
-	if (matches.length === 0) {
-	  container.innerHTML = `<p class="text-white/80">No matches reported yet.</p>`;
-	} else {
-	  matches
-		.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-		.forEach(match => {
-		  const p1 = playerMap[match.player1] || match.player1;
-		  const p2 = playerMap[match.player2] || match.player2;
-		  const winner = playerMap[match.winner] || match.winner;
-		  const date = new Date(match.createdAt).toLocaleDateString();
-
-		  const card = document.createElement('div');
-		  card.className = 'bg-white rounded-xl shadow-md p-6';
-
-		  card.innerHTML = `
-			<div class="text-sm text-gray-500 mb-1">${date}</div>
-			<div class="font-semibold">${p1} vs ${p2}</div>
-			<div class="text-gray-700">Score: <span class="font-medium">${match.score}</span></div>
-			<div class="text-green-600 font-medium mt-1">Winner: ${winner}</div>
-		  `;
-
-		  container.appendChild(card);
-		});
-	}
-  </script>
-</div>
 
   <!-- Shared Logout Script -->
   <script type="module" src="/src/js/logout.js"></script>
-  <script type="module" src="/src/main.js"></script>
+  <script type="module" src="/src/js/matches.js"></script>
 </body>
 </html>

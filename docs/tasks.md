@@ -1,6 +1,7 @@
 # ✅ Tennis Ladder App – Updated Task List (July 2025)
 
 ---
+## High Priority
 - [ ] Add logout button to every page
 - [ ] Auto-send ladder rules to player upon being added to ladder
 - [ ] Create “Resend Invite” button in Admin tools
@@ -8,15 +9,17 @@
 - [ ] Confirm challenge flow works across 2+ real accounts
 - [ ] Implement “Forgot Password” recovery screen
 - [ ] Test on iPad and desktop screen widths
-
 - [x] Add "Recent Matches" module to Dashboard (show last 3–5 matches, link to full match history)
 - [x] Wire up View All Matches button on dashboard.html
-- [x] Wire up profile.html so that it shows my profile information using uid
 - [ ] Wire up all user pages to show user-specific data e.g. stats, profile, ladders…
   - [x] stats.html
   - [x] profile.html
   - [ ] ladder.html
 
+Updated Matches page
+- [ ] update the match schema
+- [ ] Repurpose matches.html
+- [ ] Wire up match creation from challenge reporting
 
 ---
 
@@ -34,7 +37,6 @@
   - challenge-down toggle
 - [ ] Add team color to ladder cards (optional field)
 - [ ] Auto-scroll to top of dashboard after login redirect
-
 - [ ] Define ranking logic for new players joining a ladder (default, manual, or dynamic)
 
 ---
@@ -47,14 +49,6 @@
 - [x] Polish loading states on slower network
 - [ ] Admin dashboard with ladder health stats (active %, pending challenges, stale matches)
 - [ ] Admin impersonation or “view as player” mode for support/debug
-
-## Cleanup Tasks
-- [ ] Confirm if `matches.html` and `matches.js` are still needed
-- [ ] Remove all `mockRecord` references
-- [ ] Review and optionally archive `seed-test-data.cjs` and `reset-test-data.cjs`
-- [ ] Review `test-firestore.js` and remove or archive if redundant
-- [ ] Delete unused `/js/` folder in root (keep `/src/js/`)
-- [ ] Delete `index.html` if it only redirects to `dashboard.html`. Get help from chatGPT to verify `firebase.json` or `vite.config.mjs` to make sure routing still works post-deletion.
 
 ## Phase II
 - [ ] Support doubles ladder structure (team creation, pairing logic) *(phase 2 – plan schema now)*
@@ -83,13 +77,21 @@
 - [x] Admin: Create/Edit ladders + manage players
 - [x] Ladder rankings + bump logic
 - [x] Responsive layout + mobile-first design
-
 - [x] Link current user to `auth.currentUser.uid` throughout app
 - [x] Update Challenge cards to show challenger's name instead of uid
 - [x] Fetch and display actual W–L records in each dashboard ladder card (replace mockRecord)
 - [x] Improve record (W–L) rendering in player cards
 - [x] Display actual win/loss record on ladder.html top card
 - [x] Show player initials and name correctly throughout app
+- [x] Add "Recent Matches" module to Dashboard (show last 3–5 matches, link to full match history)
+- [x] Wire up View All Matches button on dashboard.html
+
+## Cleanup Tasks
+- [x] Confirm if `matches.html` and `matches.js` are still needed => we need to keep it in order to provide match reporting features in the future
+- [x] Delete `index.html` if it only redirects to `dashboard.html`. Get help from chatGPT to verify `firebase.json` or `vite.config.mjs` to make sure routing 
+- [x] Review `test-firestore.js` and remove or archive if redundant
+- [x] Review and optionally archive `seed-test-data.cjs` and `reset-test-data.cjs` => moved to dev-tools
+- [x] Remove all `mockRecord` references
 
 --- --- --- --- --- ---
 

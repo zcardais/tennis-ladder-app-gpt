@@ -9,9 +9,16 @@
 		  background: linear-gradient(to right, #667eea, #764ba2);
 	  }
   </style>
+</head>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
+</head>
 </head>
 <body class="bg-gray-100 min-h-screen text-gray-800">
+  <!-- Logout Button -->
+  <button id="logoutBtn" class="absolute left-6 top-6 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+    <i class="fa-solid fa-arrow-right-from-bracket text-white text-lg"></i>
+  </button>
   <div class="max-w-4xl mx-auto px-4 py-6">
 	<!-- Header -->
 	<div class="mb-6">
@@ -105,6 +112,8 @@
 		});
 	}
   </script>
+</script>
   <script type="module" src="/src/main.js"></script>
+  <script type="module" src="/src/js/logout.js"></script>
 </body>
 </html>

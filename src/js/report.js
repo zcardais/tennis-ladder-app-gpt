@@ -151,11 +151,8 @@ reportForm.addEventListener("submit", async (e) => {
     const winnerId = challengerWins > opponentWins ? challengeData.challenger : challengeData.opponent;
     const loserId  = winnerId === challengeData.challenger ? challengeData.opponent : challengeData.challenger;
 
-    // Normalize sets to always be [challengerScore, opponentScore]
-    const normalizedSets = sets.map(set => ({
-      you : isChallenger ? set.you : set.them,
-      them: isChallenger ? set.them : set.you
-    }));
+    // Do not swap values; keep as entered: left = you, right = opponent
+    const normalizedSets = sets;
 
     console.log(`Winner: ${winnerId}, Loser: ${loserId}`, normalizedSets);
 
@@ -173,8 +170,14 @@ reportForm.addEventListener("submit", async (e) => {
 
     // ✅ Create new match document
     const matchesRef = collection(db, "matches");
+    // Fetch ladder document for ladderName
+    const ladderRef = doc(db, "ladders", challengeData.ladderId);
+    const ladderSnap = await getDoc(ladderRef);
     await addDoc(matchesRef, {
-      uid: getCurrentUID(),
+      reportedBy: getCurrentUID(),
+      challengeId,
+      ladderId: challengeData.ladderId,
+      ladderName: ladderSnap?.data()?.name || "Unnamed Ladder",
       players: [challengeData.challenger, challengeData.opponent],
       winner: winnerId,
       loser: loserId,

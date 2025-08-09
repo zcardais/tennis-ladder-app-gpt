@@ -1,14 +1,46 @@
 <!DOCTYPE html>
-<html>
-  <head>
-	<meta http-equiv="Refresh" content="0; url=dashboard.html" />
-  </head>
-  <body>
-	Redirecting to <a href="dashboard.html">dashboard</a>...
-  <!-- Bottom Navigation -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Match History</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+</head>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-600 min-h-screen text-gray-800">
+  <!-- Purple Gradient Header -->
+  <div class="bg-gradient-to-r from-purple-500 to-indigo-600 px-6 py-8 relative">
+    <!-- Logout Button -->
+    <button id="logoutBtn" class="absolute left-6 top-8 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+      <i class="fa-solid fa-arrow-right-from-bracket text-white text-lg"></i>
+    </button>
+    <!-- Refresh Button -->
+    <button onclick="window.location.reload()" class="absolute right-6 top-8 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+      <i class="fa-solid fa-sync text-white text-lg"></i>
+    </button>
+    <!-- Page Title -->
+    <div class="text-center pt-4">
+      <h1 class="text-2xl font-bold text-white">My Results</h1>
+    </div>
+  </div>
+
+  <div class="max-w-md mx-auto py-6 px-4 pb-24 relative">
+
+    <!-- Filter Controls -->
+    <div id="filters" class="mb-4 space-y-2 text-white/90 text-sm">
+      <label for="ladderFilter" class="block text-sm font-medium text-white/80">Filter by Ladder</label>
+      <select id="ladderFilter" class="w-full rounded p-2 text-black bg-white">
+        <option value="all">All Ladders</option>
+      </select>
+    </div>
+
+    <!-- Match List -->
+    <div id="match-list" class="space-y-4"></div>
+
+    <!-- Bottom Navigation -->
 <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 py-3 z-50">
   <div class="flex justify-around">
-    <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-blue-600 font-medium transition">
+    <a href="dashboard.html" class="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition">
       <!-- Home Icon -->
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -38,6 +70,11 @@
     </a>
   </div>
 </div>
-  <script type="module" src="/src/main.js"></script>
-  </body>
+  </div>
+
+
+  <!-- Shared Logout Script -->
+  <script type="module" src="/src/js/logout.js"></script>
+  <script type="module" src="/src/js/my-results.js"></script>
+</body>
 </html>

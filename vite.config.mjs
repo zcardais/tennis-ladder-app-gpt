@@ -8,7 +8,7 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'index.html'),
+        main: path.resolve(__dirname, 'public/dashboard.html'),
         ladders: path.resolve(__dirname, 'src/ladders.html'),
         editLadder: path.resolve(__dirname, 'src/edit-ladder.html')
       }

@@ -7,17 +7,6 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 export async function init() {
   console.log("Dashboard loaded");
 
-  // Attach logout listener immediately when dashboard loads
-  const logoutBtn = document.getElementById('logout-button');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      signOut(auth)
-        .then(() => {
-          window.location.href = '/auth.html';
-        })
-        .catch(error => console.error('Error signing out:', error));
-    });
-  }
 
   const laddersList = document.getElementById('joined-ladders');
 
@@ -321,17 +310,6 @@ export async function init() {
     }
     fetchJoinedLadders(uid, playerId);
     fetchRecentMatches(uid);
-    // Attach logout handler
-    const logoutBtn = document.getElementById('logout-button');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', () => {
-        signOut(auth)
-          .then(() => {
-            window.location.href = '/auth.html';
-          })
-          .catch(error => console.error('Error signing out:', error));
-      });
-    }
   });
 }
 

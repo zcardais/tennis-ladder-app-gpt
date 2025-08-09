@@ -5,8 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
 </head>
 <body class="bg-gradient-to-br from-indigo-400 to-purple-500 text-white min-h-screen flex flex-col">
+
+  <!-- Logout Button -->
+  <button id="logoutBtn" class="absolute left-6 top-6 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+    <i class="fa-solid fa-arrow-right-from-bracket text-white text-lg"></i>
+  </button>
 
   <!-- Header -->
   <div class="px-6 pt-6 pb-4">
@@ -96,6 +102,7 @@
 	</div>
   </div>
   <script type="module" src="/src/main.js"></script>
+  <script type="module" src="/src/js/logout.js"></script>
 
 </body>
 </html>
